@@ -9,3 +9,6 @@ hs_err_pid*.log
 .DS_Store
 __pycache__/
 exploit/results_diff.json
+# 클러스터 자격증명 — 절대 커밋 금지 (admin credential)
+kube/
+*.conf

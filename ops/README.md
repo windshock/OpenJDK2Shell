@@ -46,6 +46,9 @@ tripwire. 확정 시그니처는 패치 diff 확보 후 회귀 테스트 기반�
 
 ### 사내 쿠버네티스(DFIRtx dev, EPYC-Genoa avx512vbmi 확인) 재사용 절차
 
+자격증명: `kube/dfirtx-dev.conf` (클러스터 admin — **git 제외**, 권한 600).
+접속: `export KUBECONFIG="$(git rev-parse --show-toplevel 2>/dev/null || echo ..)/kube/dfirtx-dev.conf"`
+
 2026-11-17 실측에 사용한 절차(전 노드 AVX-512 풀세트 확인됨):
 
 1. `kubectl create ns oj2s-test`
