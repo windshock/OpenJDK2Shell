@@ -108,9 +108,18 @@ find <앱작업디렉토리> -name 'hs_err_pid*.log' -newermt '-1 hour' \
 `$JAVA_HOME/conf/security/java.security` 또는 `-Djdk.serialFilter=...`:
 ```
 # 위험 가젯 전역 거부(allowlist 기반이 이상적, 최소 blocklist 예)
+# ⚠ jdk.serialFilter의 *는 직접 패키지 멤버만 매치 (하위 패키지 안 됨 — 2026-11-17 실측)
+#    TemplatesImpl은 xalan.*가 아니라 xalan.internal.xsltc.trax.*까지 써야 차단됨
 jdk.serialFilter=!org.apache.commons.collections.functors.*;!org.apache.commons.collections4.functors.*;\
-!org.codehaus.groovy.runtime.*;!com.sun.org.apache.xalan.*;!javax.management.BadAttributeValueExpException;\
-!java.rmi.server.UnicastRef;!sun.rmi.server.*;maxdepth=20;maxrefs=2000
+!org.codehaus.groovy.runtime.*;\
+!com.sun.org.apache.xalan.internal.xsltc.trax.*;\
+!com.sun.org.apache.xalan.internal.xsltc.runtime.*;\
+!com.sun.org.apache.xalan.internal.xsltc.dom.*;\
+!javax.management.BadAttributeValueExpException;\
+!java.rmi.server.UnicastRef;\
+!sun.rmi.server.*;\
+!sun.rmi.transport.*;\
+maxdepth=20;maxrefs=2000
 ```
 - RMI: `-Djava.rmi.server.useCodebaseOnly=true`(기본 true 유지), `jdk.jndi.rmi.object.factoriesFilter` 적용.
 - jstatd 중지.
@@ -119,6 +128,7 @@ jdk.serialFilter=!org.apache.commons.collections.functors.*;!org.apache.commons.
 ```
 -Dcom.sun.jndi.ldap.object.trustURLCodebase=false   # (JDK17 기본 false — 명시 고정)
 -Dcom.sun.jndi.rmi.object.trustURLCodebase=false
+-Dcom.sun.jndi.ldap.object.trustSerialData=false     # ⚠ 17.0.6~17.0.12 기본값 true (2026-11-17 소스 실측)
 -Djdk.jndi.object.factoriesFilter=java.naming.*;javax.sql.rowset.*;!*   # 미지 팩토리 차단
 ```
 
@@ -163,3 +173,11 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
 - 컴포넌트 미확정 상태의 **다중 클래스 광역 방어**다. 확정(§5)되면 해당 클래스로 좁혀 정리.
 - 완화는 임시. **근본 대응은 패치 적용**. 공지 11/18, 패치 공개 즉시 적용 권고.
+- **§4-A blocklist의 근본 한계**: `jdk.serialFilter`는 blocklist 방식이므로 미지 가젯(아직
+  발견되지 않은 JDK 내부 클래스의 readObject 부수효과)은 차단하지 못한다. allowlist 전환
+  (앱이 실제 필요로 하는 직렬화 클래스만 허용)이 이상적이나 운영 부담이 크다.
+- **와일드카드 주의 (2026-11-17 실측)**: `com.example.*` 패턴은 하위 패키지를 매치하지
+  **않는다** (직접 멤버만). TemplatesImpl을 차단하려면 최종 패키지 경로까지 정확히 써야 함:
+  `com.sun.org.apache.xalan.internal.xsltc.trax.*` (O). `com.sun.org.apache.xalan.*` (X).
+- **A3 검증 (2026-11-17)**: TemplatesImpl deserialization → defineClass → RCE가
+  17.0.8/Genoa에서 E2E 실증됨. §4-A의 수정된 패턴으로 차단 확인.
