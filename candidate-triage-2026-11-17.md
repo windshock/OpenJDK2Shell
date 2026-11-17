@@ -74,3 +74,16 @@ CVE·CVSS 미기재. 공개 보안공지 boho.or.kr **11/18 예정**. Oracle CSP
 
 1. 상위 1~4위 완화·탐지 스니펫 선작성 (무해·유효)
 2. 11/18 공지/패치 공개 즉시 본 매트릭스에 매핑 → 확정 → CVE↔커밋↔후보 대조표
+
+## 7. 검증 결과 (ZCode 실측, 2026-11-17 22:2x)
+
+| 항목 | 방법 | 결과 |
+|---|---|---|
+| 인용 커밋 10개 실재·범위 | `git log jdk-17.0.20-ga..jdk-17.0.21-ga` + `--stat` | **10/10 실재, 컴포넌트 매핑 전부 정확** — 8384654→`xsltc/compiler`§ (Template 주장 확증), 8386515→`sun.net.httpserver.Request`, 8384930→`sun.tools.jstatd`, 8382407→`com.sun.jndi.ldap` 등 |
+| "보안 커밋 42건" | 동일 범위 스타일 필터 카운트 | **45건** — 필터 차이 수준, 방향성 정확 |
+| "8.1(AC:H)" | Oracle 사전공지 원문 4회 대조 | **벡터 정보 없음 — 출처 미확인** (KISA 공문 추정). 단 AC:H+8.1이 가젯형 조건부 RCE에 부합한다는 §1 논리 자체는 타당 |
+| H2 강등(8위) 논거 | 본 저장소 §9.5·§11 데이터 교차 | **수용** — 인트린식 RCE 공개 선례 부재 + 8321599조차 데이터유실급 + 감도 인증된 하니스의 음성과 정합 |
+| §4 운영 공백 주장 | 기존 ops/ 스크립트 대조 | **사실** — 완화·탐지 모두 1~4위 미커버 → `ops/mitigate-top4.sh`·`ops/detect-rce.sh`로 즉시 보강(아래) |
+
+결론: **본 triage의 사실 기반 신뢰. H2는 8위 재배치를 수용하고, 상위 1~4위(역직렬화·JNDI/LDAP·XSLT·httpserver)를 완화·탐지 우선으로 승격.**
+보강: `ops/mitigate-top4.sh`(serialFilter·trustURLCodebase·JAXP 외부참조 차단 스니펫), `ops/detect-rce.sh`(자식프로세스·아웃바운드 LDAP/RMI 탐지 축), monitor에 boho 공지 채널 추가(11/18).

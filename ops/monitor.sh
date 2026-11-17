@@ -21,7 +21,14 @@ snapshot() {
   echo "== OpenJDK 권고 최신 =="
   # Risk matrix(컴포넌트·CVSS·버전)의 공식 게시처 — 11월 권고 등장이 두 번째 확정 트리거
   adv_latest || true
+  echo "== boho 보안공지(OpenJDK) =="
+  # KISA 공개 공지(11/18 예정 — candidate-triage §5 확정 수단 ①) — NCSC 원문 = P1 판별 열쇠
+  boho_openjdk || true
 }
+
+boho_openjdk() { curl -s --max-time 20 -A "Mozilla/5.0" \
+  "https://www.boho.or.kr/kr/bbs/list.do?menuNo=205020&bbsId=B0000133" \
+  | grep -io 'openjdk[^<]*' | head -1 || echo "NONE"; }
 
 adv_latest() { curl -s --max-time 20 -A "Mozilla/5.0" \
   "https://openjdk.org/groups/vulnerability/advisories/" \
