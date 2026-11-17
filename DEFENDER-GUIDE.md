@@ -238,5 +238,8 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 - **정정 (v4, CORRECTION-2 반영)**: v3가 "Chain 3 = CVE-2026-114938 재현"으로 표기한 것은
   오인 — 해당 테스트는 **JDK-8389989 별개 계산정확성 버그**(캐너리 FIRED)이고,
   E2E 원격 RCE(11/18)는 **TemplatesImpl 체인**(별개 취약점, add-exports 조건)이다.
-  **CVE-2026-114938(Base64 OOB) 자체의 실측은 Java4Shell 트리거로 진행 중**
-  (히프 커널리·gdb 관측 승격 예정).
+- **OOB 직접 관측 완료 (11/18)**: CVE-2026-114938의 OOB 쓰기를 힙 커널리 기법으로
+  Java 레벨에서 직접 관측 — canary 헤더 length 필드 뭉개짐(62/63B 스토어),
+  `-XX:-UseBASE64Intrinsics` 대조 CLEAN(**완화 실효 입증**).
+  상세: `OOB-OBSERVATION-2026-11-18.md`. 성공한 OOB 직후 JVM SIGABRT —
+  **급사하는 Java 프로세스 + hs_err/코어 덤프가 운영 탐지 신호**.

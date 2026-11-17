@@ -41,7 +41,12 @@
 
 - 입력: Base64 디코드 입력 끝에 4바이트 미만 패딩 테일 (예: `A`×128 + `=` = 129바이트)
 - 경로: `java.util.Base64.getDecoder().decode()` → C2 intrinsic → AVX-512 스텁 `generate_base64_decodeBlock`
-- 결함: `L_finalBit` 테일(1~63바이트) 처리에서 length<4 패딩 조각을 AVX-512 경로가 잘못 처리 → 최대 ~62바이트 OOB 쓰기
+- 결함: `L_finalBit` 테일(1~63바이트) 처리에서 length<4 패딩 조각의 `output_size`가
+  `0 - 패드수`로 **음수 언더플로** → `bzhiq`의 mod-64 해석으로 출력 마스크가
+  62/63비트로 부풀어 masked store가 dst 끝에서 62/63바이트 쓰기 (11/18 스텁 소스 분석 확정)
+- **OOB 직접 관측 완료 (11/18, DFIRtx/EPYC Genoa)**: 힙 커널리 기법으로 취약 빌드에서
+  canary 헤더 length 필드 뭉개짐 관측, `-XX:-UseBASE64Intrinsics`에서 동일 실험 CLEAN
+  — 상세: `OOB-OBSERVATION-2026-11-18.md`
 - 무인증 트리거 조건: **공격자가 Base64 디코드가 적용되는 입력을 서버에 전달 가능**해야 함 (JSON 프로토콜의 base64 필드, HTTP Basic Auth, JWT, 멀티파트 업로드 디코딩 등)
 
 ## 5. 조치 (KISA 양식 순서)
@@ -50,8 +55,11 @@
 2. **임시(패치 전)**: `JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"` — 성능 영향 극히 제한
    (intrinsic 꺼짐 → Java 스칼라 경로 fallback; C2 비활성(TieredStopAtLevel=1)과 달리
    전체 JIT 성능 저하 없음. 이 때문에 §4-E C2 비활성은 임시 완화에서 제외 권장)
+   **실효 대조 실험으로 입증** (취약빌드 OOB 관측 vs 플래그 OFF CLEAN — 11/18)
 3. **탐지**: 실패한 OOB 시도 → hs_err_pid*.log (SIGSEGV), JFR ObjectAllocationSample 이상,
-   Base64 디코드 후 예상 길이 불일치/히프 커럽션 징후
+   Base64 디코드 후 예상 길이 불일치/히프 커럽션 징후. 실측에서 성공한 OOB 직후
+   JVM이 SIGABRT로 사망(뭉개진 헤더 접촉) — **갑자기 죽는 Java 프로세스 + hs_err/코어**
+   가 유력한 운영 탐지 신호
 4. 방어 가이드 v4: DEFENDER-GUIDE.md 참조 (Base64 확정 반영)
 
 ## 6. 회신 외 유의사항
