@@ -172,3 +172,19 @@ CSPU가 Java SE **11건**이므로 release-day에 브랜치에는 **여러 Enhan
 영향 입증은 캐나리 마커(`exploit/payloads/canary.py`)로 충분하다. 역방향 소켓 스테이징
 (참고 제시됨: windshock/Linux-Reverse-Socket-Stagers, ret2csu+angrop)은 프리미티브 확정
 후 승인된 랩에서만 payloads/ 슬롯에 통입한다.
+
+### 9.4 x86_64 컨테이너 실측 (2026-11-17 4차 — colima x86_64 VM + Temurin 17.0.8)
+
+스텝 전체 오딧트(§8 절차 후속)로 후보 3곳 특정 → directed 트리거 38케이스 추가(총 231) →
+`e2e --diff`(intrinsic 강제 on/off 비교) 모드 탑재 → colima x86_64 VM(QEMU)에서 실행.
+
+| 실측 | 값 |
+|---|---|
+| 컨테이너 CPU 플래그 | `avx avx2` — **avx512 없음** (에뮬레이션 한계, 예측과 일치) |
+| UseBASE64Intrinsics 기본값 | **false** (AVX-512급 CPU에서만 기본 활성 확인 — §9.1 완화 전제의 경험적 뒷받침) |
+| differential 결과 | 231케이스 × on/off: **이상 0 / 0 / DIVERGENT 0** — brute-force intrinsic == Java 폴백 |
+| 오라클 보정 | Java basic 실측 시맨틱 반영: 꼬리 r=2→+1B·r=3→+2B 허용, r=1·비정상 패딩·불법 문자 거부 |
+
+결론: VBMI fast path(오딧트 후보 3곳의 소재)는 **AVX-512 실리콘에서만 검증 가능**.
+`ops/docker/run_x64.sh` 한 줄이 AVX-512 호스트(클라우드 c5/c6i 계열, 사내 인텔 서버)에서
+동일하게 재사용된다. 패치(17.0.21.1) 공개 시 §8.4와 병행.

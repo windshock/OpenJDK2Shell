@@ -8,3 +8,4 @@ ops/.monitor_state
 hs_err_pid*.log
 .DS_Store
 __pycache__/
+exploit/results_diff.json
