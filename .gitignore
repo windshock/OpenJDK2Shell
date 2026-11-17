@@ -1,0 +1,10 @@
+# openjdk/jdk17u blobless clone — 원격 이력 그대로 사용, 재배포하지 않음
+jdk17u/
+
+# 빌드/실행 부산물
+*.class
+exploit/results.json
+ops/.monitor_state
+hs_err_pid*.log
+.DS_Store
+__pycache__/
