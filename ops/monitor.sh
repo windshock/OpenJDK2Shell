@@ -6,13 +6,10 @@ BASE="$(cd "$(dirname "$0")" && pwd)"
 STATE="$BASE/.monitor_state"
 API="https://api.github.com/repos"
 
-jget() { curl -sf --max-time 20 "$1" || echo '{}'; }
-head_sha() { jget "$API/$1/commits?sha=$2&per_page=1" | python3 -c 'import json,sys
-try: print(json.load(sys.stdin)[0]["sha"])
-except Exception: print("-")' 2>/dev/null; }
-tag_list() { jget "$API/$1/tags?per_page=100" | python3 -c 'import json,sys
-try: print("\n".join(t["name"] for t in json.load(sys.stdin)))
-except Exception: pass' 2>/dev/null; }
+# gh 인증 API 사용(레이트리밋 회피). 경로에 owner(openjdk) 필수 — 누락 시 404로
+# 상태가 조용히 비효시돼 오탐(2026-11-17 사고의 진짜 원인)
+head_sha() { gh api "repos/openjdk/$1/commits?sha=$2&per_page=1" --jq '.[0].sha' 2>/dev/null || echo "-"; }
+tag_list() { gh api "repos/openjdk/$1/tags?per_page=100" --jq '.[].name' 2>/dev/null || echo "FETCH_FAIL"; }
 
 snapshot() {
   echo "== branch heads =="
@@ -25,18 +22,22 @@ snapshot() {
 
 NEW=0
 cur="$(snapshot)"
-if [ -f "$STATE" ]; then
-  while IFS= read -r line; do
-    [ -z "$line" ] && continue
-    case "$line" in
-      '== '* ) ;;                      # 섹션 헤더
-      *) if ! grep -qxF "$line" "$STATE"; then echo "NEW: $line"; NEW=1; fi ;;
-    esac
-  done <<< "$cur"
+if echo "$cur" | grep -qE '( -$|FETCH_FAIL)'; then
+  echo "(API 일부 실패 — 오탐 방지 위해 상태 갱신 생략)"
 else
-  echo "(초기 스냅샷 — 상태 저장)"
+  if [ -f "$STATE" ]; then
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      case "$line" in
+        '== '* ) ;;                      # 섹션 헤더
+        *) if ! grep -qxF "$line" "$STATE"; then echo "NEW: $line"; NEW=1; fi ;;
+      esac
+    done <<< "$cur"
+  else
+    echo "(초기 스냅샷 — 상태 저장)"
+  fi
+  printf '%s\n' "$cur" > "$STATE"
 fi
-printf '%s\n' "$cur" > "$STATE"
 
 if [ "$NEW" -eq 1 ]; then
   echo "→ 조치: ./check_patch.sh 후 git -C jdk17u log jdk-17.0.21.0.3-ga..origin/jdk17.0.21.1 --stat"
