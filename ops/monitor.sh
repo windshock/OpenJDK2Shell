@@ -18,7 +18,14 @@ snapshot() {
   done
   echo "== jdk17u 관련 태그 =="
   tag_list openjdk/jdk17u | grep -E '^jdk-17\.0\.(21\.1|22)' || true
+  echo "== OpenJDK 권고 최신 =="
+  # Risk matrix(컴포넌트·CVSS·버전)의 공식 게시처 — 11월 권고 등장이 두 번째 확정 트리거
+  adv_latest || true
 }
+
+adv_latest() { curl -s --max-time 20 -A "Mozilla/5.0" \
+  "https://openjdk.org/groups/vulnerability/advisories/" \
+  | grep -oE '20[0-9]{2}/[0-9]{2}/[0-9]{2}' | head -1 || echo "FETCH_FAIL"; }
 
 NEW=0
 cur="$(snapshot)"
