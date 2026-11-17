@@ -11,13 +11,14 @@ run_canary() {
   local JDK="$1" TAG="$2"
   echo "══════════ CANARY ($TAG) ══════════"
   "$JDK/bin/java" -XX:+PrintFlagsFinal -version 2>&1 | grep -i base64 || true
-  "$JDK/bin/java" -XX:+UnlockExperimentalVMOptions -Xms1g -Xmx3g -XX:G1HeapRegionSize=1m \
+  "$JDK/bin/java" -XX:+UnlockExperimentalVMOptions -Xms1g -Xmx1g -XX:G1HeapRegionSize=1m \
     -XX:G1MaxNewSizePercent=5 -Xlog:gc:file=/tmp/gc_$TAG.log -XX:+PrintCompilation \
     -cp /v/oob.jar OobCanary gap pad2 140 /tmp/gc_$TAG.log || true
   echo "══════════ CANARY END ($TAG) ══════════"
 }
 
 for TAG in jdk-17.0.21.0.3-ga jdk-17.0.21.1-ga; do
+  cd /build
   rm -rf /build/src
   git clone --depth 1 --branch "$TAG" https://github.com/openjdk/jdk17u.git /build/src
   cd /build/src
