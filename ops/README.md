@@ -37,3 +37,22 @@ JDK 버전 × AVX-512 CPU × `UseBASE64Intrinsics` 플래그를 점검해 H2 전
 tripwire. 확정 시그니처는 패치 diff 확보 후 회귀 테스트 기반으로 갱신할 것.
 애플리케이션/프록시 로그에서는 `Authorization: Basic` 값의 비정상 길이·캐릭터셋
 (대문자/숫자/+//외 문자, 8KB 초과) 출현 카운트도 병행 권장.
+
+## 5. x86_64 / AVX-512 실행 러너 — `docker/run_x64.sh`
+
+- Temurin 17.0.8 x64 이미지 + 실행 스크립트. CPU 플래그 실측(avx512 여부) 후
+  `e2e.py --diff` 자동 실행. colima(x86_64 QEMU·brute-force 경로)와 AVX-512 호스트
+  (VBMI 경로) 양쪽에서 동일하게 사용.
+
+### 사내 쿠버네티스(DFIRtx dev, EPYC-Genoa avx512vbmi 확인) 재사용 절차
+
+2026-11-17 실측에 사용한 절차(전 노드 AVX-512 풀세트 확인됨):
+
+1. `kubectl create ns oj2s-test`
+2. victim 클래스를 ConfigMap(binaryData)으로 적재. Pod는
+   `eclipse-temurin:17.0.8_7-jdk-jammy` 이미지 + `command: ["java","-cp","/v",
+   "UnauthBase64Svc","18080","0.0.0.0"]` + `JAVA_TOOL_OPTIONS=-XX:+UseBASE64Intrinsics`
+   (OFF 팔은 `-XX:-`), limits 2CPU/2Gi, `restartPolicy: Never`, nodeName으로 워커 고정
+3. NodePort 31808 Service → 맥에서 `python3 exploit/trigger_gen.py --fire <nodeIP> 31808`
+4. on/off 두 번 실행 → JSONL 비교(DIVERGENT). 크래시 시 Pod 로그·hs_err 보존
+5. 종료: `kubectl delete ns oj2s-test` (클러스터 원상복구)

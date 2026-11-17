@@ -71,7 +71,9 @@ NCSC 공지 대응 3단계 수행 결과. 전 과정은 `vuln-analysis-2026-11-1
 | `ops/inventory.sh` | JDK 버전 × AVX-512 × 플래그 노출 판정 |
 | `ops/mitigate.sh` | 임시 패치: `-XX:-UseBASE64Intrinsics` (product 플래그, 소스 검증) / WAF 스니펫 |
 | `ops/scan_hs_err.sh` | 공격 시도/크래시 tripwire |
-| `exploit/` | E2E 검증 하니스 — 인증 전 디코드 희생서비스 + 트리거 193케이스 + 오라클 대조 + hs_err 감시. 프리미티브 확정 전 무기화 없음(캐나리 정책, `exploit/README.md`) |
+| `exploit/` | E2E 검증 하니스 — 인증 전 디코드 희생서비스 + 트리거 **231케이스**(directed 포함) + `--diff` differential + 실측 증거(`results/`). 프리미티브 확정 전 무기화 없음(캐나리 정책) |
+| `ops/docker/` | x86_64 검증 러너 (Temurin 17.0.8 이미지 + `run_x64.sh`) — AVX-512 호스트 공용 |
 | `jdk17u/` | blobless clone (gitignore — 저장소에 미포함) |
 
 현재 상태: **17.0.21.1 GA 대기** (Oracle CSPU 2026-11-17 릴리스 예정). 감시 자동화 동작 중.
+H2는 AVX-512 실리콘(사내 DFIRtx 클러스터) 차등 테스트에서 무관측 — **약화됨, 최종 판정은 패치 diff** (상세: `vuln-analysis-2026-11-17.md` §9.5).

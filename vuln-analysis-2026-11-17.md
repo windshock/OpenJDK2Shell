@@ -188,3 +188,23 @@ CSPU가 Java SE **11건**이므로 release-day에 브랜치에는 **여러 Enhan
 결론: VBMI fast path(오딧트 후보 3곳의 소재)는 **AVX-512 실리콘에서만 검증 가능**.
 `ops/docker/run_x64.sh` 한 줄이 AVX-512 호스트(클라우드 c5/c6i 계열, 사내 인텔 서버)에서
 동일하게 재사용된다. 패치(17.0.21.1) 공개 시 §8.4와 병행.
+
+### 9.5 AVX-512 실리콘 실측 (2026-11-17 5차 — 사내 DFIRtx dev 쿠버네티스)
+
+**방법(기술 요약)**: JVM의 Base64 디코드는 구현이 두 벌이다 — AVX-512(VBMI) CPU에서만
+실행되는 손으로 쓴 어셈블리 루틴(**[A]**, stubGenerator가 생성)과 항상 존재하는 Java
+참조 구현(**[B]**, Base64.java). 양자는 임의의 입력에 대해 항상 동일한 결과를 내야
+하므로, 같은 입력을 [A] 강제 환경과 [B] 환경에 각각 먹이고 **결과가 갈리는 순간 = [A]의
+버그가 직접 증명**된다(차등 테스트). [A]는 버그 전례(8321599)가 있는 코드로, NCSC 버전
+하한(17.0.6)이 [A]의 도입 시점과 일치해 H2의 대상이었다.
+
+- **환경**: DFIRtx dev 클러스터 — 전 노드 AMD EPYC-Genoa(`avx512vbmi/bw/vl` /proc/cpuinfo
+  실측 확인). Temurin 17.0.8 Pod + 클래스 ConfigMap + NodePort 31808, Mac에서 발사.
+  `UseBASE64Intrinsics` on/off를 JAVA_TOOL_OPTIONS로 양팔 확인(true/false)
+- **결과**: 231케이스 × (on/off) — **MISMATCH 0/0, DIVERGENT 0, 크래시 없음**
+- **증거**: `exploit/results/oj2s_genoa_{on,off}.jsonl` (커밋 36ad7d1)
+- **판정**: 오딧트 후보 3곳은 이 입력 공간에서 무결 → **H2 약화(데이터커럽션 클래스
+  한정)**. 단 ① 231 형태가 입력 전수가 아님 ② 조용한 힙 커럽션은 출력 차이로 관측 안 됨
+  ③ 가설 자체가 틀릴 수 있음. **최종 판정은 패치 diff(§8.4)**
+- 검증 3계층 완결: arm64(도구) → x86 에뮬레이션(brute-force 경로) → AVX-512 실리콘(VBMI 경로)
+- 운영: 테스트 후 `oj2s-test` 네임스페이스 삭제로 클러스터 원상복구
