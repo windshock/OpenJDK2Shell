@@ -11,17 +11,24 @@
 
 ## 0. 가장 중요한 한 가지
 
-**C2 JIT 버그는 잘못된 코드를 조용히 실행한다 — 크래시·로그·네트워크 이상이 전혀 없다.**
+**C2 JIT 익스플로잇은 전통적 시그니처(크래시·자식 프로세스·네트워크 비콘)를 회피할 수 있다.
+그러나 완전히 탐지 불가능한 것은 아니다 — JIT 컴파일/디옵트 이벤트, 비정상 메서드 호출
+워밍업, 코드 캐시·힙 이상은 관측 가능하다.**
 
 | 클래스 | 크래시 | 자식프로세스 | 아웃바운드 | 탐지 가능성 |
 |---|---|---|---|---|
-| **C2 JIT (CVE-2026-114938)** | 없음 | 없음 | 없음 | **거의 불가능** (계산 결과 틀어짐) |
+| **C2 JIT** | 성공 시 없음 / **실패 시 hs_err** | 없음* | 없음* | **§3-D/E로 가능** (JFR·디옵트·워밍업 패턴) |
 | 역직렬화 가젯 | 없음 | 있을 수 있음 | 있을 수 있음 | §3-A/3-B로 가능 |
 | JNDI/LDAP | 없음 | 있을 수 있음 | 있음 | §3-B로 가능 |
 
-C2 JIT 버그의 탐지: **해석 실행 vs JIT 실행 결과 비교** 또는 프로덕션에서
-예상 외 정수 오버플로/ArrayIndexOutOfBounds 모니터링 — 실질적으로 어려움.
-**완화(§4-E)가 유일한 실효 대응**.
+*C2 JIT 페이로드가 순수 메모리 조작에 그치는 경우만. 실제 목표(쉘·지속성·측방 이동)는
+결국 ProcessBuilder/exec·클래스 로딩·소켓으로 귀결되므로 §3-A/3-B가 다시 유효해짐.
+
+**C2 JIT 탐지의 핵심 (§3-D/E 상술)**:
+1. **JFR 상시 수집** — 가장 비용 효율적 (Compilation·Deoptimization 이벤트)
+2. **JIT 워밍업 시그니처** — 특정 메서드가 짧은 시간에 비정상 반복 호출
+3. **실패한 시도는 hs_err 덤프** — JIT 익스플로잇은 불안정(힙 레이아웃·타이밍 민감)
+4. 완화(§4-E)는 여전히 권장 — 탐지와 병행
 
 ---
 
@@ -53,7 +60,7 @@ ps -eo pid,comm,args | grep -i '[j]ava' | awk '{print $1}' | while read p; do
 
 ## 3. 탐지
 
-### 3-A. JVM 자식 프로세스 (역직렬화 RCE — C2 JIT에는 무효)
+### 3-A. JVM 자식 프로세스 (역직렬화 RCE 페이로드 단계에서 유효)
 
 ```bash
 # Linux auditd
@@ -62,13 +69,13 @@ ps -eo pid,comm,args | grep -i '[j]ava' | awk '{print $1}' | while read p; do
 -a always,exit -F arch=b64 -S execve -F exe=/usr/bin/curl -k java_child
 ```
 
-### 3-B. 예상 외 아웃바운드 (JNDI/RMI 콜백 — C2 JIT에는 무효)
+### 3-B. 예상 외 아웃바운드 (JNDI/RMI 콜백 — 페이로드가 콜백하는 경우 유효)
 
 ```bash
 ss -tnp 2>/dev/null | grep -i java | grep -vE '127\.0.0\.1|::1|<내부대역>'
 ```
 
-### 3-C. 로그 시그니처 (역직렬화·JNDI·XML — C2 JIT에는 무효)
+### 3-C. 로그 시그니처 (역직렬화·JNDI·XML 경유 공격에 유효)
 
 ```
 java.io.InvalidClassException | filter status: REJECTED | TemplatesImpl
@@ -76,14 +83,28 @@ javax.naming.* lookup | trustURLCodebase | ldap:// rmi://
 TransformerConfigurationException | ACCESS_EXTERNAL | DOCTYPE.*SYSTEM
 ```
 
-### 3-D. C2 JIT 잘못된 결과 (CVE-2026-114938 — 탐지 매우 어려움)
+### 3-D. C2 JIT (CVE-2026-114938) — JFR·컴파일·디옵트 이벤트
+
+**탐지 원칙**: 전통적 시그니처(크래시·프로세스·네트워크)를 회피할 수 있으나,
+JVM 런타임 레벨에서는 관측 가능한 흔적이 남는다.
+
+| 관측 축 | 방법 | 신호 |
+|---|---|---|
+| **JFR 상시 수집** (최우선) | `-XX:StartFlightRecording=filename=...` 또는 `jcmd <pid> JFR.start` | Compilation 이벤트 급증, Deoptimization 폭증, 비정상 ObjectAllocationSample |
+| **JIT 워밍업 시그니처** | 앱 로그·APM에서 특정 메서드의 비정상 반복 호출 패턴 모니터링 | C2 컴파일은 tiered threshold(~10K 회 호출)를 넘겨야 하므로, 공격 준비 단계에서 특정 메서드가 짧은 시간에 비정상적으로 반복됨 |
+| **컴파일러 로그** | `-XX:+PrintCompilation -XX:+TraceDeoptimization` | 비정상 컴파일·디옵트 패턴 |
+| **Code Cache 이상** | `-XX:+PrintCodeCache` / JFR CodeCacheStatistics | 코드 캐시 점유·무효화 급변 |
+| **실패한 시도** | `hs_err_pid*.log` 모니터링 | JIT 익스플로잇은 불안정(힙 레이아웃·타이밍 민감) — 실패한 시도는 SIGSEGV/hs_err 덤프를 남김 |
+| **런타임 예외** | AIOOBE·ArithmeticException 모니터링 | C2가 경계검사를 제거한 루프에서 발생 |
 
 ```bash
-# JIT vs 해석 결과 비교 (라이브러리 — 핵심 루프만):
+# JFR 상시 수집 (운영 오버헤드 < 1%):
+java -XX:StartFlightRecording=duration=60s,filename=/tmp/jfr/health.jfr,maxsize=100m ...
+# 분석: jfr print --events Compilation,Deoptimization /tmp/jfr/health.jfr
+
+# 비교 검증 (핵심 루프만, 상황별):
 # 1. 특정 메서드를 C2 제외: -XX:CompileCommand=exclude,com.app.CriticalLoop::method
 # 2. 결과 비교 → 다르면 C2 버그 의심
-# 3. 프로덕션에서는 ArrayIndexOutOfBoundsException·ArithmeticException 모니터링
-#    (C2가 경계검사를 없앤 루프에서 발생)
 ```
 
 ### 3-E. 크래시 (메모리커럽션 보조)
@@ -173,7 +194,9 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 1. §3-A/3-B 경보 발생 호스트 **격리** (네트워크 차단, 종료 금지 — 메모리 보존)
 2. 수집: `ps`/`/proc` 트리, 네트워크 연결, 최근 생성 파일, 앱 로그
 3. 지표: java 자식 셸, 미지 아웃바운드, `/tmp` 신규 바이너리
-4. **C2 JIT 침해는 위 지표가 전혀 없음** — 앱 로직 오류(잘못된 계산·OOB)로만 의심 가능
+4. **C2 JIT 침해의 경우**: 성공한 페이로드는 위 지표가 없을 수 있으나,
+   JFR 녹화(§3-D)에서 Compilation/Deoptimization 이상, 잘못된 계산 결과,
+   실패한 시도의 hs_err 덤프를 확인. **완전히 흔적이 없는 것은 아님**.
 5. 범위 산정 후 자격증명 교체·패치·재배포
 
 ## 7. KISA 양식 매핑 (11/20 회신)
@@ -187,13 +210,18 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
 ## 8. 한계 (정직)
 
-- **C2 JIT 버그는 탐지가 사실상 불가능** — 완화(§4-E) 또는 패치가 유일한 대응
+- **C2 JIT 익스플로잇의 탐지**: 전통적 시그니처(크래시·자식 프로세스·네트워크 비콘)를
+  회피할 수 있으나 **완전히 탐지 불가능한 것은 아니다**. JIT 컴파일/디옵트 이벤트,
+  비정상 메서드 호출 워밍업, 코드 캐시·힙 이상은 관측 가능하며(§3-D),
+  **JFR 상시 수집이 가장 비용 효율적인 탐지 수단**이다. 완화(§4-E)는 탐지와 병행.
 - **§4-E 성능 영향**: TieredStopAtLevel=1은 CPU-bound 서비스에 20~50% 저하.
   적용 대상 신중 선별 필요 (외부 입력 처리 서비스 우선, 내부 배치는 후순위)
 - **§4-A blocklist 한계**: 미지 가젯은 차단 못함 (allowlist가 이상적이나 운영 부담)
 - **와일드카드 주의**: `com.example.*`는 하위 패키지 매치 안 됨 (직접 멤버만)
   TemplatesImpl 차단: `...xsltc.trax.*` (O). `...xalan.*` (X)
 - **A3 검증 (11/17)**: TemplatesImpl → defineClass → RCE를 17.0.8에서 실증.
-  §4-A 수정 패턴으로 차단 확인.
+  §4-A 수정 패턴으로 차단 확인. **단, JDK 17 기본 설정에서는 모듈 시스템이
+  superclass 접근을 차단하여 원격 공격 불가** — add-opens 환경에서만 유효.
 - **Chain 3 검증 (11/18)**: CVE-2026-114938을 17.0.8/Genoa에서 재현
   (test3: 66 ≠ -87065049). C2 버그 → 잘못된 경계검사 → OOB 가능성 입증.
+  **원격 E2E 실증 완료**: RMI 1회 호출 → C2 JIT 버그 → 캐너리 FIRED.
