@@ -120,3 +120,29 @@ OOB로 쓴 파손 헤더는 **할당 시점에 정상 헤더로 덮여 소거**�
 |---|---|---|---|
 | HTTP Basic/JWT/SAML (헤더, ≤8KB) | ≤6KB (TLAB) | 소거됨 (할당 시 헤더 재기록) | **불가 (DoS만)** |
 | POST body decode (업로드/캐시, MB급) | MB급 (humongous, old-gen) | **지속** (인접 live 객체 헤더 파손) | **가능 (배치 결정론 남음)** |
+
+## 9. 포화 실험 결과 — 실앱 앱-프레임 SIGSEGV 확정 (11/18 심야 4차)
+
+**조건**: 힙 70% 포화(live humongous ~893MB/1280MB, filler 142개 + cred) → drop(6R gap,
+양옆 live) → trigger ×5 → pump/GC → **JVM 사망**.
+
+**크래시 감별 (hs_err 2735줄, results/spring_lab_hs_err.log)**:
+```
+SIGSEGV SEGV_MAPERR si_addr=0x00007f49a5699ade
+Current thread: "http-nio-8080-exec-2" (Tomcat 워커 — 요청 처리 스레드)
+Problematic frame: J 7347 c1 lab.AvatarApp.status()  ← 우리 앱 코드 (C1 컴파일)
+```
+- **GC 크래시가 아니라 앱 코드가 파손된 캐시 배열을 읽다 죽음** — status()의 캐시
+  length 합산 루프(checkcast/length 읽기)가 파손 헤더를 건드림
+- alive() 체크가 status()를 호출했기 때문에 사망 — **관측 행위 자체가 파손에 접촉**
+  (웹셸 단계에서는 이 우회가 필요: 파손 배열을 건너뛰는 diag 등)
+- MAPERR = 매핑 안 된 VA 읽기 — 파손된 length(또는 klass)로 배열 밖을 읽은 것
+- 에러 리포터 자체도 2차 SIGSEGV (레지스터 덤프 실패) — 심층 파손 재확인
+
+**데모 대조**: Calif 데모 화면의 "TRY 18/96", "ATTEMPT 01/12" 카운터 = **확률적 재시도
+캠페인** — 우리의 낮은 적중률(150발 burst 0건 → 포화 70%에서 5트리거+churn에 사망)과
+동일 구조. 승격은 결정론이 아니라 **재시도 캠페인**임이 데모와 실측 양쪽에서 확인.
+
+**현재 확정 체인 (실앱 Spring/Tomcat, 무인증 POST)**:
+fill(700MB 정상 업로드로 힙 70% 포화) → drop(6R gap) → trigger(패딩 b64) →
+OOB 62B → **캐시 배열 헤더 파손 지속** → 앱 코드 SIGSEGV → 프로세스 사망.
