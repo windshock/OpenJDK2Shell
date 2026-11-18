@@ -101,4 +101,4 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
   (`CronList`에서 `OpenJDK 17.0.21.1 패치 감시` 확인)
 - 클러스터: 항상 ns 생성→테스트→`kubectl delete ns` 원상복구 사이클
 - blobless clone 규율: `git grep` 전트리 금지 / auto-gc 비활성 (`gc.auto 0` 설정됨)
-- 협업자 초대: HeeRPOU 완료, kerberosjoo27@gmail.com은 GitHub 사용자명 미확인 (보류)
+- 협업자 초대: HeeRPOU 완료, 별도 후보 1명은 GitHub 사용자명 미확인 (보류)
