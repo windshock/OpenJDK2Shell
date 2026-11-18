@@ -91,3 +91,32 @@ length 파손의 **부호 제어**(disclosure의 핵심)까지는 미달 — 현
    free run이 gap 외에 존재하지 않게 함 (힙 포화 직전 운영 — 실서비스 장애 조건과 유사)
 3. 그래도 불가 시: CVE 표면 = DoS(실증 완료) + 체인 1·2 역직렬화 = RCE/웹셸(실증 완료)로
    최종 구분 확정. Calif 데모의 추가 세부는 비공개 상태.
+
+## 7. 구조적 확정 — 소스 레벨 (11/18 심야 3차 갱신)
+
+### 7-1. 2인자 decode 정정
+`decode(src, dst)`도 `decode0`을 호출한다(Base64.java:623) → intrinsic 발동 → 쓰기 발생.
+이전 갱신의 "2인자는 intrinsic 미적용" 주장은 오독. PoC Stage1의 실제 결함은 다른 곳:
+dst를 128B로 잡아 쓰기(dst+48..112)가 **배열 내부에 전부 포함** — OOB가 아예 없음.
+
+### 7-2. TLAB 전방 쓰기 상쇄 — Basic auth 표면 승격 구조적 불가 (핵심 발견)
+작은 dst(65B 트리거 → 50B)의 쓰기는 **할당되지 않은 TLAB 미래 영역**에 떨어진다.
+JVM은 이후 그 주소에 객체를 할당할 때 **헤더(mark/klass/length)를 새로 기록**하므로
+OOB로 쓴 파손 헤더는 **할당 시점에 정상 헤더로 덮여 소거**된다. 바디도 앱 내용으로 덮임.
+→ 실측과 완전 일치: 150발 트리거 + GC 6회 전부 생존, bleed 0.
+→ **결론: Basic auth/JWT/SAML 헤더류(작은 dst) 표면은 본 CVE의 승격이 구조적으로 불가.**
+   이 표면의 영향 = DoS(파손은 소거되나 쓰기 자체는 매번 발생 — GC/런타임 타이밍에 따른
+   잔여 위험만 존재).
+
+### 7-3. 승격 가능 유일 경로 재확인
+**대형 dst(POST body decode → old-gen humongous)가 인접 live 객체(기존 헤더)를 때리는 것**
+— HBase/Synthetic에서 length 파손 실측 완료. 남은 변수는 G1 free-list 배치 결정론(§6-1).
+표적 스코핑: "upload/attach/캐시형 decode 엔드포인트(post-auth 무관, body 제한 완화 조건)"
+= Keycloak 데모의 실제 침투점도 이 부류로 추정.
+
+## 8. 최종 표면 스코핑 (방어자 관점 요약)
+
+| 표면 | dst 크기 | 파손 지속성 | 승격 |
+|---|---|---|---|
+| HTTP Basic/JWT/SAML (헤더, ≤8KB) | ≤6KB (TLAB) | 소거됨 (할당 시 헤더 재기록) | **불가 (DoS만)** |
+| POST body decode (업로드/캐시, MB급) | MB급 (humongous, old-gen) | **지속** (인접 live 객체 헤더 파손) | **가능 (배치 결정론 남음)** |
