@@ -59,3 +59,35 @@ length 파손의 **부호 제어**(disclosure의 핵심)까지는 미달 — 현
 | "Native read / write confirmed" | 원거리 쓰기 (§3-3) — 연구 난도 최고 구간 |
 | "Webshell uploaded / HTTP 200" | 커맨드 실행 확보 후 자동화 |
 | 체인 1(RMI 역직렬화) 무인증 **웹셸(지속 제어)** | **✅ 완료** — uid=0(root), HTTP 폴링 에이전트 |
+
+## 6. 고정 실험실 + 대량 트리거 실험 (11/18 심야, 2차 갱신)
+
+### 구축: persistent lab (spring_lab.sh)
+- victim 파드 상시 유지 (재빌드/재웜업 없이 반복 실험), /api/diag(헤더 length 직독), /api/login(Basic decode)
+- 반복 주기 20-30분 → **1-2분** (실험당)
+
+### 공개 PoC(ikow/java4shell-poc) 분석 결과
+- Stage 1(WriterPrimitive)은 `decode(src,dst)` 2인자 형태 사용 — **이 경로는 intrinsic 미적용
+  (decode0/decodeBlock만 intrinsic) → OOB 불가 → Stage 1 코드 자체가 미검증**
+- 즉 공개 PoC에는 작동하는 승격 체인이 없고, Calif 실제 기법은 비공개 (데모 영상만 존재)
+- README의 트리거/근본원리(65B, bzhi full-mask)는 우리 실측과 일치 — 트리거 부분만 신뢰 가능
+
+### 대량 트리거 실험 (150발, 실앱 Spring/Tomcat 17.0.8)
+- 전 발 발동 확인 (HTTP 500 = decode IAE — 쓰기는 IAE 전 완료)
+- **결과: 캐시 배열 헤더 파손 0건 / JVM 생존 / GC 생존**
+- 해석: trigger dst(6R humongous)가 캐시 배열 인접이 아닌 산발 free run에 배치되며
+  경계 쓰기가 free space에 흡수됨. 배치는 G1 free-list 순서에 의존 (비결정론)
+- 추가 확정: decode(String→byte[])의 trailing '=' IAE는 **src 끝 2문자에서만 발생** —
+  dst 길이 파손과 무관하게 원격 검증 시 body 끝 정합성 필요
+
+### 이전 관측 정정
+- "len=6990466 이변" = 공격 스크립트의 **이중 base64 인코딩 버그** (b64encode(b64text)를
+  body로 전송 → 서버 디코드 결과가 b64text 자체) — OOB/힙 파손과 무관. 스크립트 수정 완료.
+
+### 남은 승격 경로 (우선순위)
+1. dst 배치 강제: gc+heap 로그로 free-run 지도를 보고 drop/trigger 타이밍 조정,
+   또는 fill 직후 즉시 drop+trigger(다른 할당 개입 전)로 gap 인접 배치 확률 극대화
+2. humongous 경계 쓰기가 자연 발생하는 부하 형태 연구: 캐시 배열 밀도를 90%+로 올려
+   free run이 gap 외에 존재하지 않게 함 (힙 포화 직전 운영 — 실서비스 장애 조건과 유사)
+3. 그래도 불가 시: CVE 표면 = DoS(실증 완료) + 체인 1·2 역직렬화 = RCE/웹셸(실증 완료)로
+   최종 구분 확정. Calif 데모의 추가 세부는 비공개 상태.

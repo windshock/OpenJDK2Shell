@@ -62,6 +62,55 @@ public class AvatarApp {
         return ResponseEntity.ok("{\"pumpedMB\":" + mb + "}\n");
     }
 
+    static final Base64.Decoder DEC = Base64.getDecoder();
+    /** Thread-local reused decode buffer — real Basic-auth apps precompute/reuse.
+     *  decode(src, dst) two-arg form: CVE-2026-114938 underflow writes 64B at dst+48,
+     *  overflowing this 64B buffer by 48B into the NEXT TLAB allocation (username bytes). */
+    static final ThreadLocal<byte[]> SCRATCH = ThreadLocal.withInitial(() -> new byte[64]);
+
+    /** Basic-auth login — decodes attacker-controlled b64 PRE-AUTH (like every Java app). */
+    @GetMapping("/api/login")
+    public ResponseEntity<String> login(
+            @RequestHeader(value = "Authorization", required = false) String auth) {
+        if (auth == null || !auth.startsWith("Basic ")) {
+            return ResponseEntity.status(401)
+                .header("WWW-Authenticate", "Basic realm=\"lab\"").body("401 auth required\n");
+        }
+        byte[] src = auth.substring(6).trim().getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] dst = SCRATCH.get();
+        int dp;
+        try {
+            dp = DEC.decode(src, dst);   // ← CVE-2026-114938 intrinsic underflow (65B b64 text)
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body("401 bad base64\n");
+        }
+        String credStr = new String(dst, 0, dp, java.nio.charset.StandardCharsets.ISO_8859_1);
+        int colon = credStr.indexOf(':');
+        String username = colon >= 0 ? credStr.substring(0, colon) : credStr;
+        if ("admin".equals(username) && colon >= 0
+                && "admin".equals(credStr.substring(colon + 1))) {
+            return ResponseEntity.ok("{\"login\":\"ok\"}\n");
+        }
+        // echo username in the failure — JavaBleed channel
+        return ResponseEntity.status(401)
+            .body("401 login failed for user: " + username + "\n");
+    }
+
+    /** Diagnostic — read each cached array's length DIRECTLY from the header
+     *  (catches OOB-smashed lengths instantly; corrupt sign/rotation observable) */
+    @GetMapping("/api/diag")
+    public ResponseEntity<String> diag() {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Map.Entry<String, byte[]> e : CACHE.entrySet()) {
+            if (!first) sb.append(',');
+            first = false;
+            sb.append("\"").append(e.getKey()).append("\":").append(e.getValue().length);
+        }
+        sb.append('}');
+        return ResponseEntity.ok(sb.toString());
+    }
+
     @GetMapping("/api/status")
     public ResponseEntity<String> status() {
         long bytes = 0;
