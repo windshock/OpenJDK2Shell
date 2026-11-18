@@ -110,6 +110,21 @@ java -XX:StartFlightRecording=duration=60s,filename=/tmp/jfr/health.jfr,maxsize=
 # 2. 결과 비교 → 다르면 C2 버그 의심
 ```
 
+### 3-E2. WAF/IDS 시그니처 (외부 공개 룰 — alert-first 권고)
+
+취약 표면: 표준 알파벳·URL 디코더(MIME은 무관). JDK17 최소 트리거 ~129자(21/25/27은 ~65자).
+베이스64가 정상 트래픽에도 흔하므로 **alert 모드로 FP 측정 후 차단 전환**, JDK 패치 후 제거.
+
+```text
+1) Basic auth 초장문: Authorization:\s*Basic\s+[A-Za-z0-9+/]{128,}={1,2}
+2) 단일문자 연속 + 패딩 PoC 시그니처: ([A-Za-z0-9+/_-])\1{63,}={1,2}  (body: /P, header: /H)
+3) JWT(URL-safe) 세그먼트에 '=' 패딩 — 정상 JWT는 무패딩이므로 그 자체가 이례:
+   [A-Za-z0-9_-]{85,}={1,2}(\.|[^A-Za-z0-9_=-]|$)
+```
+
+(출처: 커뮤니티 공개 룰 정리 — 결정적 차단이 아니라 스캐너/저노력 시도 포착용.
+결정적 공격은 정상처럼 보이는 b64로 회피 가능 — 패치가 근본 대응.)
+
 ### 3-E. 크래시 (메모리커럽션 보조)
 
 ```bash

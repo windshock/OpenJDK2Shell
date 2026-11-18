@@ -28,6 +28,15 @@
 
 트리거가 `Base64.getDecoder().decode()` (decode 경로)이므로 하한 = decode intrinsic 도입 버전 = **17.0.6**. NCSC 하한과 정합.
 
+**보강 (11/19 외부 검토 반영)**:
+- upstream 커밋: `5177a70b385c16f26ede191fdac7aaba0bed0f8b` (JDK mainline, Tobias Hartmann,
+  2026-10-13 작성 — 엠바고 후 11/17 공개). 17u backport가 위 8ea73158af.
+- **Java 8**: 일반 8u는 디코드 intrinsic이 없어 무영향 — 단 **Oracle Java SE 8 Performance
+  Pack(8u511b33-perf)** 만 취약 코드 포함, 8u513-perf에서 수정 (회신 시 8 라인 서술 주의).
+- 벤더 수정 현황(11/18): Oracle CSPU(17.0.21.1 등)·Corretto·Zulu released,
+  Temurin/Microsoft/RHEL pending, Debian stable 취약 — 회신 시 벤더별 .1 빌드 명시 요망
+  (`17.0.21` base 빌드는 미수정).
+
 ## 3. 완화 플래그: `-XX:-UseBASE64Intrinsics` (product, 전 아키텍처 유효)
 
 **활성 메커니즘 (소스 검증)**:
