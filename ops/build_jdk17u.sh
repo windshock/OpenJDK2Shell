@@ -2,6 +2,7 @@
 # In-pod build + canary: vulnerable (17.0.21.0.3) vs patched (17.0.21.1) from public jdk17u
 set -ex
 export DEBIAN_FRONTEND=noninteractive
+mkdir -p /build
 apt-get update -qq
 apt-get install -y -qq git build-essential autoconf zip unzip file cpio \
   libx11-dev libxext-dev libxrender-dev libxrandr-dev libxi-dev libxt-dev libxtst-dev \

@@ -17,7 +17,14 @@ V="${1:-victim:18082}"
 BASE="http://$V"
 
 echo "════ Java4Shell E2E attacker → $V ════"
-curl -sf -m 5 "$BASE/health" >/dev/null || { echo "victim not ready"; exit 1; }
+# victim's HTTP server comes up AFTER its C2 warmup (~60s) — retry patiently (observed
+# run-2 race: attacker became ready before victim and aborted with AEXIT=1)
+READY=0
+for i in $(seq 1 90); do
+  if curl -sf -m 5 "$BASE/health" >/dev/null 2>&1; then READY=1; break; fi
+  sleep 3
+done
+[ "$READY" = "1" ] || { echo "victim not ready after 270s"; exit 1; }
 echo "[0] victim alive: $(curl -s -m 5 "$BASE/status")"
 
 # 1. payloads

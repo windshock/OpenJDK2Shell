@@ -67,8 +67,13 @@ fast path(`shiftto==18 && sp < sl-4`)에서 intrinsic 호출 → 스텁이 전�
 | 2 | temurin 17.0.8 | intrinsic ON | pad1 (63B) | **★★★ OOB-OBSERVED ★★★** | 42→134 |
 | 3 | temurin 17.0.8 | **`-XX:-UseBASE64Intrinsics`** | pad2 | **CLEAN** (완화 실효 입증) | 0 |
 | 4 | temurin 17.0.8 | fresh small heap | pad2 | survived (흡수, 음성 — 스텁 미실행 가능성 포함) | 0 |
-| 5 | 자체 빌드 17.0.21.0.3-ga | intrinsic ON | pad2 | **(빌드 진행 중 — 양성 대조)** | — |
-| 6 | 자체 빌드 **17.0.21.1-ga** | intrinsic ON | pad2 | **(빌드 진행 중 — 수정빌드 대조)** | — |
+| 5 | **자체 빌드 17.0.21.0.3-ga** | intrinsic ON | pad2 | **★★★ OOB-OBSERVED (62B) ★★★** — 양성 대조 (11/18 오후) | 42 |
+| 6 | **자체 빌드 17.0.21.1-ga (수정)** | intrinsic ON | pad2 | **CLEAN** — **동일 소스·동일 플래그에서 패치(8393212)만의 차이로 차단 입증** | 0 |
+
+셀 5·6 = 공개 jdk17u 태그 2종을 클러스터에서 동일 조건(-Xmx1g·리전 1m)으로 직접 빌드해
+대조 (`ops/build_jdk17u.sh`, 로그 `exploit/results/jdk17u-build-and-canary.log`).
+intrinsic은 두 빌드 모두 ON(Genoa 에르고노믹스) — **유일한 변수는 패치 커밋 하나**.
+3중 대조(§6-3) 최종 확정: 취약 ON=OOB / 완화 OFF=CLEAN / **수정빌드 ON=CLEAN**.
 
 **관측 포렌식 (셀 1·2 공통)**:
 ```
