@@ -89,11 +89,17 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | 자산 | 위치 |
 |---|---|
 | **E2E 체인 3 문서** | `exploit/E2E-EXPLOIT-SUITE.md` (체인 3 절) |
+| **★ 체인 4: 실앱 E2E (HBase REST 기본 설치 PWNED ×2)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 4 절 — `ops/hbase_e2e_setup.sh`·`ops/hbase_e2e_attack.py`·`exploit/hbase_e2e.sh` |
 | **관제 공유 문서** | `OPS-SHARING-2026-11-18.md` — 와이어 시그니처·탐지룰·pcap 목차 |
+| **WAS 로그·크래시 덤프 패턴** | `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md` — 앱로그 A1~A4 룰, hs_err 서명, GC 로그 룰 |
 | **pcap (공유용)** | `exploit/results/pcap/j4s-e2e-vuln-attacker-full.pcap.gz` (13초 전체, 트리거+사망 RST), `victim-flood.pcap.gz`, `soc-r1.pcap` |
 | E2E 코드 | `exploit/src/Java4ShellE2EVictim.java` + `ops/e2e_java4shell_attacker.sh` + `exploit/e2e_java4shell.sh` |
-| E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회 실행, PWNED 5회) |
+| E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회, PWNED 5회) / `results/hbase_*_vuln.log` (실앱 PWNED 2회) |
 | 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
+
+**레포 상태: PUBLIC** (11/18 전환 — `kerberosjoo27@gmail.com`만 마스킹 후 공개).
+Keycloak은 본 CVE 표적 부적합 판정 (E2E-SUITE 체인 4-한계: base64url 무스토어·
+SAML 커스텀 디코더·헤더 한계). 실앱 표적 = **HBase REST (ScannerModel JDK Base64)**.
 
 ## 8. 운영 메모
 
