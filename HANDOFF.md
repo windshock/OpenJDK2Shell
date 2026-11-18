@@ -1,12 +1,13 @@
 # HANDOFF — 신규 세션 인계 문서
 
-작성: 2026-11-18 오전 · 갱신: 2026-11-18 오후 (§6-1·3·4·5 완수 반영)
+작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E PWNED + 관제 공유 pcap)
 
 ## 1. 프로젝트 한 줄 요약
 
 OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대응 프로젝트.
-사전 분석 → 취약점 실증 → 무기화 → 방어 가이드 → **OOB 직접 관측 → KISA 회신 초안** 완료.
-**H2 가설(Base64 intrinsic) 최종 확정 + OOB 쓰기 실측 완료.**
+분석 → 실증 → 무기화 → 방어 가이드 → **OOB 직접 관측 → 원격 E2E PWNED(5회 재현) →
+관제 공유용 pcap → KISA 회신 초안**까지 전부 완료. §6 남은 과제 없음 (§6-2 Keycloak은
+플러드 방식이 비현실적으로 느려 중단·부분 로그만 보존 — E2E victim 모델로 대체 실증).
 
 ## 2. 저장소 위치·환경
 
@@ -60,22 +61,20 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | `exploit/victims/` | DeserVictim·EvilDgcServer·StringDecodeSvc 등 |
 | `exploit/results/` | 원격 실증 로그 전부 |
 
-## 6. 남은 과제 (2026-11-18 오후 기준)
+## 6. 남은 과제 (2026-11-18 저녁 기준 — §6 전 과제 완수)
 
-1. ~~Java4Shell OOB 실측 승격~~ — **완료** (`OOB-OBSERVATION-2026-11-18.md`,
-   힙 커널리로 62/63B 쓰기 관측, 완화 대조 입증)
-2. **애플리케이션 표적 재현** (미착수, 선택): Keycloak/JWT 파싱이 유력 표적
-   (Base64.getUrlDecoder 같은 intrinsic 스텁 공유, 패딩 허용 여부 확인 필요)
-3. ~~완화 실효 검증~~ — **셀 1·3 완료** (취약 ON=OOB 관측 / OFF=CLEAN).
-   **셀 5·6 (자체 빌드 17.0.21.0.3 vs 17.0.21.1) 파드 빌드 진행 중**
-   (`java4shell-build/jdk-build`, `ops/build_jdk17u.sh`, ~2-3h).
-   완료 시 OOB-OBSERVATION §4 갱신 + 커밋 + `kubectl delete ns java4shell-build`
-4. ~~DEFENDER-GUIDE 최종 갱신~~ — **완료** (v4)
-5. ~~KISA 양식~~ — **초안 완료** (`KISA-REPLY-2026-11-20.md`): 컴포넌트 =
-   **hotspot/compiler** (8ea73158af = stubGenerator_x86_64.cpp), 하한 17.0.6 =
-   decode intrinsic 도입 (07050b000c/JDK-8268276) 코드 아키폴로지, 완화 =
-   `-XX:-UseBASE64Intrinsics` (에르고노믹스: vm_version_x86.cpp:951 — AVX-512VL+BW
-   CPU 기본 활성). 회신 전 검토 필요.
+1. ~~OOB 실측 승격~~ — 완료 (`OOB-OBSERVATION-2026-11-18.md`, 62/63B 관측)
+2. ~~애플리케이션 표적~~ — Keycloak 플러드는 웜 병목으로 중단(부분 로그 보존),
+   **E2E victim 모델로 대체 실증 완료** (업로드 디코드 표면)
+3. ~~완화 3중 대조~~ — **완결**: 취약 ON=OOB / 완화 OFF=CLEAN /
+   **자체빌드 17.0.21.1 ON=CLEAN** (패치 8393212 효과 입증,
+   `exploit/results/jdk17u-build-and-canary.log`)
+4. ~~DEFENDER-GUIDE v4~~ — 완료
+5. ~~KISA 회신 초안~~ — 완료 (`KISA-REPLY-2026-11-20.md`, 11/20 회신 전 검토만 남음)
+
+**후속 후보 (신규 작업)**: Keycloak JWT 경로 유효 트리거 설계(base64url은 패딩 미허용 —
+`getUrlDecoder`는 intrinsic 스텁 공유하되 트리거 형태 재설계 필요), 타 라인(8·11·21)
+하한 아키폴로지 스폿 체크, hs_err 기반 탐지룰 튜닝.
 
 ## 7. 신규 세션 시작 명령
 
@@ -84,6 +83,17 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 ```
 
 한 줄이면 충분 — 이 문서가 자기완결.
+
+## 9. E2E·관제 공유 자산 (11/18 저녁 추가)
+
+| 자산 | 위치 |
+|---|---|
+| **E2E 체인 3 문서** | `exploit/E2E-EXPLOIT-SUITE.md` (체인 3 절) |
+| **관제 공유 문서** | `OPS-SHARING-2026-11-18.md` — 와이어 시그니처·탐지룰·pcap 목차 |
+| **pcap (공유용)** | `exploit/results/pcap/j4s-e2e-vuln-attacker-full.pcap.gz` (13초 전체, 트리거+사망 RST), `victim-flood.pcap.gz`, `soc-r1.pcap` |
+| E2E 코드 | `exploit/src/Java4ShellE2EVictim.java` + `ops/e2e_java4shell_attacker.sh` + `exploit/e2e_java4shell.sh` |
+| E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회 실행, PWNED 5회) |
+| 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
 
 ## 8. 운영 메모
 
