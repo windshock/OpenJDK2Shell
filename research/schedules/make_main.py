@@ -12,4 +12,12 @@ for b in range(1, 11):
                     "input": inp, "episode_class": "main", "K": 12, "block": b})
 d = json.load(open("research/schedules/pilot2-2026-11-23.json"))["digests"]
 json.dump({"run_id": "main-2026-11-23", "digests": d, "episodes": eps}, open("research/schedules/main-2026-11-23.json", "w"), indent=1)
-print(" ".join(e["arm"] for e in eps))
+# deviation D-1: parallel lanes = one pod per node; whole blocks per lane (each block holds all 4 arms)
+import sys
+lanes = sys.argv[1:] or ["dev02"]           # e.g. dev02 dev03 dev04 dev05 dev06
+for li, node in enumerate(lanes):
+    blocks = [b for b in range(1, 11) if (b - 1) % len(lanes) == li]
+    json.dump({"run_id": "main-2026-11-23", "lane": node, "digests": d,
+               "episodes": [dict(e, lane=node) for e in eps if e["block"] in blocks]},
+              open("research/schedules/main-2026-11-23-%s.json" % node, "w"), indent=1)
+    print(node, "blocks", blocks)

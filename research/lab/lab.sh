@@ -9,8 +9,8 @@ set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 export KUBECONFIG="${KUBECONFIG:-$ROOT/kube/dfirtx-dev.conf}"
-NS=j4s-research
-NODE=dfirtx-worker-dev02
+NS="${NS:-j4s-research}"   # lane: NS=j4s-research-b for the 2nd parallel pod
+NODE="${NODE:-dfirtx-worker-dev02}"
 IMG_1708=docker.io/library/eclipse-temurin@sha256:bfc748eb9766e9c031bd79f6a37d5d7fcb1ba1adca56106fc4c661fa255340c8
 IMG_17021=docker.io/library/eclipse-temurin@sha256:acf46b4e646df812fd95c54669bc80d44acef68f0bde1dd420ea47897de0d637
 IMG_170211=docker.io/library/eclipse-temurin@sha256:39a7842fefd685466676073a9507666c82e983af8936551c8c3cf825442a123a
@@ -46,12 +46,12 @@ spec:
   - name: app
     image: $IMG_1708
     command: ["bash","/v/supervisor.sh"]
-    resources: {requests: {cpu: "3", memory: 3Gi}, limits: {cpu: "3", memory: 3Gi}}
+    resources: {requests: {cpu: "3", memory: 2560Mi}, limits: {cpu: "3", memory: 3Gi}}
     volumeMounts: [{name: v, mountPath: /v}, {name: share, mountPath: /share}, {name: jdks, mountPath: /jdks}]
   - name: driver
     image: python:3.12.7-slim-bookworm
     command: ["sh","-c","echo DRIVER-READY; sleep infinity"]
-    resources: {requests: {cpu: "1", memory: 512Mi}, limits: {cpu: "1", memory: 1Gi}}
+    resources: {requests: {cpu: "500m", memory: 256Mi}, limits: {cpu: "1", memory: 1Gi}}
     volumeMounts: [{name: v, mountPath: /v}, {name: share, mountPath: /share}]
   volumes:
   - {name: v, configMap: {name: lab-files}}
