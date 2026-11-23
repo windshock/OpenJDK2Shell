@@ -20,7 +20,10 @@ MAIN = json.load(open(os.path.join(SCHED, "main-2026-11-23.json")))
 # lanes already running: node -> (namespace, schedule file)
 lanes = {"dev02": ["j4s-research", "main-2026-11-23-dev02.json"],
          "dev01": ["j4s-research-dev01", "main-2026-11-23-dev01.json"]}
-pending = [[3, 8], [4, 9], [5, 10]]          # blocks not yet assigned to a running lane
+# extra lanes already running: LANES_EXTRA="dev03:j4s-research-dev03:main-2026-11-23-dev03-b3.json"
+for spec in filter(None, os.environ.get("LANES_EXTRA", "").split(",")):
+    _n, _ns, _sc = spec.split(":"); lanes[_n] = [_ns, _sc]
+pending = [[int(b)] for b in os.environ.get("PENDING", "3,4,5,8,9,10").split(",")]  # single blocks -> spread over all lanes
 candidates = ["dev03", "dev04", "dev05", "dev06"]
 rejected = set()
 
@@ -63,12 +66,26 @@ def start(node, sched):
     lanes[node][1] = sched
     say("RUN %s %s -> %s" % (node, sched, out.splitlines()[-1] if out else rc))
 
+def pod_ready(ns):
+    _, ph = sh("kubectl -n %s get pod lab -o jsonpath='{.status.phase}'" % ns, timeout=30)
+    _, lg = sh("kubectl -n %s logs lab -c driver" % ns, timeout=30)
+    return ph.strip() == "Running" and "DRIVER-READY" in lg
+
 def deploy(node):
     ns = "j4s-research-" + node
-    say("DEPLOY %s (ns %s)" % (node, ns))
-    rc, out = sh("NS=%s NODE=dfirtx-worker-%s %s deploy" % (ns, node, LAB), timeout=1200)
-    if "LAB-READY" not in out:
-        say("DEPLOY-FAIL %s: %s" % (node, out[-200:])); return False
+    _, ph = sh("kubectl -n %s get pod lab -o jsonpath='{.status.phase}'" % ns, timeout=30)
+    if ph.strip() in ("Pending", "Running"):
+        say("ADOPT %s (existing pod %s) — waiting for ready" % (node, ph.strip()))
+        for _ in range(120):
+            if pod_ready(ns): break
+            time.sleep(10)
+        if not pod_ready(ns):
+            say("DEPLOY-FAIL %s: adopted pod never ready" % node); return False
+    else:
+        say("DEPLOY %s (ns %s)" % (node, ns))
+        rc, out = sh("NS=%s NODE=dfirtx-worker-%s %s deploy" % (ns, node, LAB), timeout=1200)
+        if "LAB-READY" not in out:
+            say("DEPLOY-FAIL %s: %s" % (node, out[-200:])); return False
     _, cpu = sh("kubectl -n %s exec lab -c app -- grep -m1 -o -w -E 'avx512vbmi|avx512bw' /proc/cpuinfo" % ns, timeout=60)
     _, model = sh("kubectl -n %s exec lab -c app -- grep -m1 'model name' /proc/cpuinfo" % ns, timeout=60)
     if "avx512vbmi" not in cpu or "avx512bw" not in cpu:
@@ -78,14 +95,27 @@ def deploy(node):
     say("LANE-UP %s %s" % (node, model.split(":")[-1].strip()))
     return True
 
+import threading
+LOCK = threading.Lock()
+deploying = set()
+
+def bring_up(node):
+    ok = deploy(node)
+    with LOCK:
+        deploying.discard(node)
+        if ok and pending:
+            start(node, write_sched(node, pending.pop(0)))
+        elif ok:
+            say("LANE-IDLE %s (no pending blocks)" % node)
+
 def main():
     say("coordinator up; lanes=%s pending=%s" % (list(lanes), pending))
     while True:
         rn = ready_nodes()
         for node in candidates:
-            if node in rn and node not in lanes and node not in rejected and pending:
-                if deploy(node):
-                    start(node, write_sched(node, pending.pop(0)))
+            if node in rn and node not in lanes and node not in rejected and node not in deploying and pending:
+                deploying.add(node)
+                threading.Thread(target=bring_up, args=(node,), daemon=True).start()
         idle = 0
         for node in list(lanes):
             if lanes[node][1] is None: continue
@@ -93,11 +123,12 @@ def main():
             if running: continue
             if not complete:
                 say("RESUME %s (%d/%d done)" % (node, nd, nt)); start(node, lanes[node][1]); continue
-            if pending:
-                start(node, write_sched(node, pending.pop(0)))
-            else:
-                idle += 1
-        if not pending and idle == len([n for n in lanes if lanes[n][1]]):
+            with LOCK:
+                if pending:
+                    start(node, write_sched(node, pending.pop(0)))
+                else:
+                    idle += 1
+        if not pending and not deploying and idle == len([n for n in lanes if lanes[n][1]]):
             say("ALL-LANES-COMPLETE"); return
         time.sleep(60)
 
