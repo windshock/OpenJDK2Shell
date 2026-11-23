@@ -78,7 +78,7 @@ pad1/pad2 모두 store 위치가 같으므로 canary 접촉 범위도 같다 (�
 - `OOB-OBSERVATION` §5 표: "**쓰기 폭·위치·내용 실측** (62/63B, dst 끝, 디코드 가비지 패턴)"
 - `WAS-LOG-CRASH-ANALYSIS` §4: "1MiB/2MiB 심층 오프셋 온전 → **파손이 62~63B로 국한** — 광역 커럽션 아님."
 
-**정정:** 멀리 떨어진 두 오프셋이 온전하다는 사실은 쓰기 폭의 상한을 확정하지 못한다. 실측된 것은 **canary 헤더 length 필드 손상(위치)**과 **값이 디코드 가비지 패턴이라는 것(내용)**이다. 폭은 소스 계산값(C-2)이고 `UNESTABLISHED (실측 아님)`으로 표기한다.
+**정정:** 멀리 떨어진 두 오프셋이 온전하다는 사실만으로는 쓰기 폭의 상한을 확정하지 못한다. (초기 표기 `UNESTABLISHED`.) **2026-11-23 갱신:** `MechProbe`(Unsafe 헤더 원시 diff, 실제 취약 빌드)로 인접 객체 선두 **48B 연속 [0..47]**이 변경된 것을 직접 측정했다 — mark(0–7)+narrowKlass(8–11)+length(12–15)+body[0..31], 64B masked store의 꼬리가 갭 끝을 넘어 인접 객체를 덮은 것과 정합. 폭은 이제 추정이 아니라 **실측(48B)**이다 (`research/mechanism/MECH-RESULTS.md`). length는 음수로 떨어져 부호 비제어도 재확인.
 
 ### C-4. EXTERNAL-REVIEW "완전 일치" 판정
 
