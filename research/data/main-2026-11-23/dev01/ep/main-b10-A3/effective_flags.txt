@@ -1,0 +1,5 @@
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 1342177280                                {product} {command line}
+     intx UseAVX                                   = 3                                    {ARCH product} {default}
+     bool UseBASE64Intrinsics                      = false                                     {product} {command line}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}

@@ -1,5 +1,7 @@
 # 통합 연구 계획 v2.0 — Java4Shell 정정·계측·인과·예측 (2026-11-23)
 
+> **상태 (11/23 17:10):** 트랙 C·D, Phase 0, 실험 A·B 완료 → `research/RESULTS-2026-11-23.md` (A causal supported / B INCONCLUSIVE). Phase 3 미착수 (PI 결정)
+
 v1.0(`RESEARCH-PLAN-2026-11-19.md`)을 **대체하지 않고 확장**한다. v1.0의 범위 선언·사전등록 지표(Brier)·
 episode 단위 분할·게이트는 그대로 상속한다. v1.0 파일은 이력으로 보존한다.
 

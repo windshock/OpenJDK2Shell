@@ -5,16 +5,18 @@
 
 작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E PWNED + 관제 공유 pcap)
 
-## 0. 현재 상태 (2026-11-23 갱신 — 이 절이 최신)
+## 0. 현재 상태 (2026-11-23 17:10 KST 갱신 — 이 절이 최신)
 
-- **활성 계획:** `RESEARCH-PLAN-2026-11-23.md` (v2.0) · 사전등록 `research/PREREG-2026-11-23.md` (잠금 커밋 5fbe402)
-- **완료:** 트랙 C 정정(`CORRECTION-3.md` C-1~C-10), 트랙 D 방어 문서(DEFENDER-GUIDE v5), Phase 0 랩, 파일럿
-- **진행 중:** 실험 A 본수집 `main-2026-11-23` — 클러스터 ns `j4s-research`, 노드 dev02
-  - 상태: `research/lab/lab.sh status` · 회수: `research/lab/lab.sh pull main-2026-11-23` · 중단: `lab.sh stop`
-  - 재개: 드라이버는 `DONE` 표시된 episode를 건너뛰므로 `lab.sh run research/schedules/main-2026-11-23.json` 재실행으로 이어감
-- **분석:** `python3 research/analysis/analyze.py research/data/main-2026-11-23/attempts_all.jsonl --out …` +
-  `research/.venv/bin/python research/analysis/crosscheck.py …` (venv: numpy/scipy/sklearn, requirements.txt)
-- kubeconfig: `kube/dfirtx-dev.conf` (gitignore, 600)
+- **실험 A·B 완료** → `research/RESULTS-2026-11-23.md`
+  - A: **causal supported** — 17.0.21+9 크래시 6/10 vs 패치(17.0.21.1+2)·완화 플래그·정상 입력 각 0/10 (Holm p=0.016)
+  - B: **INCONCLUSIVE** — 양성 6 < 8. 탐색적으로는 episode 초반 집중 → episode 수준 배치 가설
+  - 크래시 6/6 서명 동일: G1 Conc#0, SEGV_MAPERR, G1CM 마킹 프레임
+- 계획 `RESEARCH-PLAN-2026-11-23.md` v2.0 · 사전등록 `research/PREREG-2026-11-23.md` (잠금 5fbe402, D-1 보충 1·2)
+- 원자료 `research/data/main-2026-11-23/` (lane별 ep/ + attempts_merged.jsonl), 재분석:
+  `python3 research/analysis/analyze.py research/data/main-2026-11-23/attempts_merged.jsonl` · `research/.venv/bin/python research/analysis/crosscheck.py …`
+- 클러스터: 워커 dev01~06 (dev03~06은 11/23 16:10 가입, 전부 EPYC-Genoa VBMI). 실험 네임스페이스 `j4s-research*` 전부 삭제됨.
+  재실험 시 `research/lab/lab.sh deploy|run|status|pull|stop` (NS·NODE 환경변수) + `research/lab/coordinator.py` (PENDING·LANES_EXTRA)
+- **남은 결정 (PI):** RESULTS §6 — SCOPE 마감 권고 / 선택지: episode 수준 배치 가설 새 사전등록
 - 아래 §1~§9는 11/18 기준 기록 — 바이트 수·Keycloak·TLAB 서술은 CORRECTION-3로 정정됨
 
 ## 1. 프로젝트 한 줄 요약
