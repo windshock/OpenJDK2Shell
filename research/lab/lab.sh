@@ -71,13 +71,29 @@ run)
   $K exec lab -c driver -- sh -c 'cd /share && nohup setsid python3 -u /v/episode_driver.py /share/schedule.json >> /share/driver.log 2>&1 < /dev/null & echo started'
   ;;
 status)
-  $K exec lab -c driver -- sh -c 'tail -n ${N:-5} /share/driver.log; echo; echo "episodes done: $(ls /share/ep/*/DONE 2>/dev/null | wc -l)  rows: $(wc -l < /share/attempts_all.jsonl 2>/dev/null)"; pgrep -f episode_driver >/dev/null && echo DRIVER-RUNNING || echo DRIVER-STOPPED'
+  $K exec lab -c driver -- sh -c 'tail -n ${N:-5} /share/driver.log; echo; echo "episodes done: $(ls /share/ep/*/DONE 2>/dev/null | wc -l)  rows: $(wc -l < /share/attempts_all.jsonl 2>/dev/null)"; python3 -c "import os;print(\"DRIVER-RUNNING\" if any(b\"episode_driver.py\" in open(\"/proc/%s/cmdline\"%p,\"rb\").read() for p in os.listdir(\"/proc\") if p.isdigit() and os.path.exists(\"/proc/%s/cmdline\"%p)) else \"DRIVER-STOPPED\")"'
   ;;
 pull)
   RUN="$2"; OUT="$ROOT/research/data/$RUN"; mkdir -p "$OUT"
   # stdout.log (PrintCompilation) is large — keep it, but compressed
   $K exec lab -c driver -- sh -c 'cd /share && tar czf - ep attempts_all.jsonl driver.log schedule.json 2>/dev/null' | tar xzf - -C "$OUT" && \
     find "$OUT/ep" -name stdout.log -size +1M -exec gzip -f {} \; ; echo "pulled -> $OUT"; ls "$OUT/ep" | wc -l
+  ;;
+stop)
+  $K exec lab -c driver -- python3 -c '
+import os,signal,time
+me=os.getpid()
+for p in os.listdir("/proc"):
+    if p.isdigit() and int(p)!=me:
+        try: c=open("/proc/%s/cmdline"%p,"rb").read()
+        except Exception: continue
+        if b"episode_driver.py" in c: os.kill(int(p),signal.SIGTERM); print("driver stopped",p)
+time.sleep(2)
+for e in os.listdir("/share/ep"):
+    d="/share/ep/"+e
+    if os.path.exists(d+"/pid") and not os.path.exists(d+"/exit_code"):
+        os.kill(int(open(d+"/pid").read()),signal.SIGTERM); print("jvm stopped",e)
+'
   ;;
 teardown)
   kubectl delete ns $NS --ignore-not-found --timeout=120s >/dev/null 2>&1; echo NS-CLEAN

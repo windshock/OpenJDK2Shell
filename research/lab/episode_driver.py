@@ -180,6 +180,25 @@ def observe_headers(expected):
     return {"state": "OBSERVED" if bad else "NOT_OBSERVED", "crash_during_observation": False,
             "corrupted_ids": bad, "scope_n": scope}
 
+WARM_SHAPES = None
+def warm(n):
+    for i in range(n):
+        H.req("POST", "/api/avatar?id=warm", WARM_SHAPES[i & 3])
+    H.req("DELETE", "/api/avatar?id=warm")
+
+def ensure_c2(epid, start_ms, rounds=10, n=2000):
+    """Intrinsic gate: tier-4 decode0 must be live right before the trigger.
+    The trigger's IAE path and large fills deoptimize decode0 (observed in pilot:
+    C2 compile at 7.2s made not entrant at 8.3s during fill) -> re-warm with valid
+    shapes only. Returns number of re-warm rounds used, or -1 if the gate failed."""
+    for r in range(rounds + 1):
+        if decode0_c2_live(epid, int(time.time() * 1000) - start_ms + 1000):
+            return r
+        if r < rounds:
+            warm(n)
+            time.sleep(0.5)
+    return -1
+
 def run_episode(ep, run_id, digests):
     epid, K = ep["epid"], int(ep.get("K", 12))
     base = {"run_id": run_id, "episode_id": epid, "arm": ep["arm"], "jdk": ep["jdk"],
@@ -200,11 +219,10 @@ def run_episode(ep, run_id, digests):
     shapes = [b"QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=", b"A" * 4096 + b"AB",
               b"A" * 4096 + b"ABC", b"A" * 4096 + b"AB=="]
     import base64
-    bodies = [base64.b64encode(s) for s in shapes]
+    global WARM_SHAPES
+    WARM_SHAPES = [base64.b64encode(s) for s in shapes]
     t0 = time.time()
-    for i in range(WARM_N):
-        H.req("POST", "/api/avatar?id=warm", bodies[i & 3])
-    H.req("DELETE", "/api/avatar?id=warm")
+    warm(WARM_N)
     warm_s = round(time.time() - t0, 1)
 
     fb = b"A" * (4 * FILL_M) + b"AB"
@@ -231,8 +249,22 @@ def run_episode(ep, run_id, digests):
         c0 = cycles_done(epid)
         row["reclaim_cycle_completed"] = wait_cycle(epid, c0, 90)
         if not alive():
+            # died after the previous trigger's observation passed -> delayed crash of attempt k-1
             row.update(process_crash=1, crash_phase="pre-trigger", validity="INVALID",
-                       invalid_reason="died-before-trigger")
+                       invalid_reason="died-before-trigger", attributed_to_attempt=(k - 1 if k > 1 else None),
+                       exit_code=stop_episode(epid),
+                       hs_err=[f for f in os.listdir(ep_dir(epid)) if f.startswith("hs_err")])
+            emit(row, epid); dead = True; break
+        rounds = ensure_c2(epid, start_ms)
+        row["c2_gate_rewarm_rounds"] = rounds
+        if rounds < 0:
+            row.update(validity="INVALID", invalid_reason="c2-gate-failed", process_crash=0)
+            emit(row, epid); continue
+        if not alive():
+            row.update(process_crash=1, crash_phase="during-rewarm", validity="INVALID",
+                       invalid_reason="died-during-rewarm", attributed_to_attempt=(k - 1 if k > 1 else None),
+                       exit_code=stop_episode(epid),
+                       hs_err=[f for f in os.listdir(ep_dir(epid)) if f.startswith("hs_err")])
             emit(row, epid); dead = True; break
         row.update(gc_features(epid, t_drop))
         trig_uptime_ms = int(time.time() * 1000) - start_ms
