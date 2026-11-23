@@ -1,0 +1,5 @@
+# Phase 1 이미지 고정 (P0-10) — 2026-11-23 DFIRtx dfirtx-worker-dev02 pull 기준
+eclipse-temurin:17.0.8_7-jdk-jammy     sha256:bfc748eb9766e9c031bd79f6a37d5d7fcb1ba1adca56106fc4c661fa255340c8
+eclipse-temurin:17.0.21_9-jdk-jammy    sha256:acf46b4e646df812fd95c54669bc80d44acef68f0bde1dd420ea47897de0d637
+eclipse-temurin:17.0.21.1_2-jdk-jammy  sha256:39a7842fefd685466676073a9507666c82e983af8936551c8c3cf825442a123a
+# inventory.sh 검증 결과: 17.0.8=EXPOSED, 17.0.21=EXPOSED, 17.0.21.1=NOT AFFECTED (CPU: avx512vbmi/bw/vl=yes)

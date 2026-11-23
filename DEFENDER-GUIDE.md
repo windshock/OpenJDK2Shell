@@ -1,4 +1,4 @@
-# 방어자 가이드 — OpenJDK 17.0.6+ Base64 OOB (Java4Shell) 대응 (v4 — 진범 확정 반영)
+# 방어자 가이드 — OpenJDK 17.0.6+ Base64 OOB (Java4Shell) 대응 (v5 — 2026-11-23 영향 조건·수정 빌드·완화 보강)
 
 > **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
 
@@ -36,11 +36,35 @@
 v3 §4-E의 우선순위를 뒤집었다(해당 서술은 v4에서 폐기).
 (§3-D의 JFR 기반 C2 관측 기법은 CVE-2026-114941 등 C2 계열 대비로 보존.)
 
+### 0-1. 영향 판정 조건 (v5, 2026-11-23 — 소스 재확인)
+
+아래 **전부**를 충족해야 취약 코드가 실행된다. 하나라도 아니면 해당 경로는 동작하지 않는다.
+
+| 조건 | 확인 방법 | 근거 |
+|---|---|---|
+| x86-64 | `uname -m` | 스텁은 x86 전용 (ARM64·에뮬레이션 무관) |
+| **AVX-512 VBMI + BW** (+VL, BMI2) | `grep -o -w -E 'avx512(vbmi\|bw\|vl\|f)\|bmi2' /proc/cpuinfo \| sort -u` | 취약 벡터 경로는 `supports_avx512_vbmi() && supports_avx512bw()`일 때만 생성 (`stubGenerator_x86_64.cpp`). Intel Ice Lake 이후 / AMD Zen4 이후. **VBMI 없는 AVX-512(Skylake-SP·Cascade Lake)는 intrinsic이 켜져도 이 경로를 타지 않음** |
+| 영향 JDK | 실제 프로세스의 런타임 (§1 — 번들 JRE·컨테이너 포함) | 17.0.6~17.0.21.0.x 등, §5 수정 빌드 미만 |
+| intrinsic 활성 | `jcmd <pid> VM.flags -all \| grep UseBASE64Intrinsics` | `UseAVX>2 && avx512vl && avx512bw`면 기본 true |
+| 공격자 입력이 `java.util.Base64.Decoder`에 도달 | sink 인벤토리 (아래) | 끝에 `=` 패딩, 4바이트 미만 꼬리, JDK 17은 128자 초과 |
+
+- **HTTP 버전·HTTP/2 설정은 조건이 아니다.** 결함은 디코더 안에 있고, 입력이 디코더에 닿는 경로라면
+  프로토콜은 무관하다. 실측(2026-11-23, DFIRtx Genoa, Temurin 17.0.8): HTTP/2를 지원하지 않는 서버 2종
+  (JDK `com.sun.net.httpserver`, Spring Boot/Tomcat 기본 설정)에 HTTP/1.1 요청만으로 트리거 →
+  JVM SIGSEGV 사망. pcap에도 HTTP/1.1 요청만 기록됐다.
+- **URL-safe 디코더(`getUrlDecoder`)도 해당**: `=` 패딩을 허용하고, 스텁은 URL 모드에서도 같은 쓰기를
+  수행한다 (CORRECTION-3 C-5). 무패딩 JWT 세그먼트 자체는 트리거 형태가 아니지만, 라이브러리가 패딩을
+  어떻게 처리하는지는 제품별로 확인해야 한다.
+- **pre-auth Base64 sink 인벤토리**: HTTP Basic, JWT/OIDC, SAML, 쿠키, 업로드/첨부, JSON base64 필드,
+  메시지 큐·RPC 페이로드. 각 sink가 표준 `java.util.Base64`를 쓰는지, 자체 구현인지 기록한다.
+
 ---
 
 ## 1. 자산 식별 (영향 선별)
 
-- **진범(CVE-2026-114938) 영향**: Java 17.0.6~17.0.21.0.3 (hotspot/compiler, 8·11·17·21·25·27 전 라인)
+- **진범(CVE-2026-114938) 영향**: Java 17.0.6~17.0.21.0.x (hotspot/compiler). 타 라인: 21·25·27은 §5 수정 빌드 미만이 영향.
+  **표준 OpenJDK 8/11은 decode intrinsic이 없어 무영향**, 단 Oracle Java SE 8 Performance Pack(8u511b33-perf)은 영향(8u513-perf 수정).
+  (v4의 "8·11 … 전 라인" 표기는 과잉 — v5 정정)
 - **별개 실증 취약점 (우리가 발견)**:
   - TemplatesImpl 역직렬화 RCE: 17.0.0~17.0.20 (SecurityManager=null 기본값)
   - LDAP trustSerialData=true: 17.0.6~17.0.12 (기본값 true)
@@ -130,6 +154,11 @@ java -XX:StartFlightRecording=duration=60s,filename=/tmp/jfr/health.jfr,maxsize=
 
 ### 3-E. 크래시 (메모리커럽션 보조)
 
+> **해석 주의 (v5)**: 크래시가 없다고 안전한 것이 아니고, 프로세스가 살아 있다고 메모리가 무사한 것도 아니다.
+> 우리 랩에서는 작은 입력 150발이 크래시 없이 흡수됐다. 외부 보고(Hadrian, REPORTED)에는 코드 실행 후에도
+> 서비스가 정상 응답을 계속한 사례가 있다. 크래시는 **실패했거나 불안정한 시도의 흔적**일 뿐이다.
+> 탐지는 보조 수단이고 패치나 완화가 대체 수단이 아니다.
+
 ```bash
 find <앱작업디렉토리> -name 'hs_err_pid*.log' -newermt '-1 hour' \
   -exec grep -lE 'SIGSEGV|SIGBUS|loop|opto' {} \;
@@ -144,6 +173,7 @@ find <앱작업디렉토리> -name 'hs_err_pid*.log' -newermt '-1 hour' \
 ```bash
 # 표적 완화 — Base64 AVX-512 intrinsic만 차단 (나머지 JIT 최적화는 그대로)
 # 비 AVX-512VL+BW CPU에서는 intrinsic 자체가 비활성이므로 이 옵션은 무해(공석)
+# (취약 벡터 경로는 VBMI+BW CPU에서만 생성 — §0-1)
 JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"
 ```
 
@@ -157,8 +187,25 @@ JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"
 
 > **활성 메커니즘 (소스 검증)**: 플래그 정적 기본값 false(`runtime/globals.hpp`),
 > 단 `vm_version_x86.cpp:951-954`에서 `UseAVX>2 && avx512vl && avx512bw` CPU에
-> 에르고노믹스 동적 활성 → **AVX-512 서버는 기본 취약**. 명시 플래그는 에르고노믹스를
-> 무시하므로 위 옵션이 확실.
+> 에르고노믹스 동적 활성. 단 취약 벡터 경로는 **VBMI+BW CPU**에서만 생성되므로
+> "AVX-512 서버는 기본 취약"(v4)은 과잉 — **VBMI 지원 AVX-512 서버가 기본 취약** (v5 정정, CORRECTION-3 C-10).
+> 명시 플래그는 에르고노믹스를 무시하므로 위 옵션이 확실.
+
+**적용 확인 (필수)**: 옵션 추가 후 **JVM 재기동**, 그리고 실행 중인 프로세스에서 직접 확인한다
+(설정 파일만 보고 판정하지 않는다):
+```bash
+jcmd <pid> VM.flags -all | grep -E 'UseBASE64Intrinsics|UseAVX'
+# 기대: UseBASE64Intrinsics = false  {command line}
+```
+
+### 4-E2. 광역 대안: `-XX:UseAVX=2`
+
+```bash
+JAVA_TOOL_OPTIONS="-XX:UseAVX=2"
+```
+`UseAVX>2` 조건이 깨지므로 Base64 intrinsic 에르고노믹스가 활성화되지 않는다 (`vm_version_x86.cpp`).
+대신 **AVX-512 기반 최적화 전체를 포기**하므로 성능 영향 범위가 넓다. §4-E를 쓸 수 없는 경우
+(옵션 화이트리스트 등)에만 고려하고, 적용 후 같은 방법으로 `UseAVX`·`UseBASE64Intrinsics`를 확인한다.
 
 ### 4-A. 역직렬화 (별개 취약점 — 계속 유효)
 
@@ -214,6 +261,17 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 > 것은 오인 — 8389989는 별개 **계산정확성 버그**(C2 루프 조기 종료, OOB/RCE 아님).
 > CVE-2026-114938의 실수정은 **8393212** (stubGenerator_x86_64.cpp, decode 테일 경계검사).
 
+**벤더 수정 빌드 (v5 — 확인일 명시)**:
+
+| 배포 | 수정 빌드 | 출처·확인일 |
+|---|---|---|
+| OpenJDK / Oracle | 17.0.21.1, 21.0.13.1, 25.0.5.1, 27.0.1.1 | Oracle CSPU 11/17 |
+| **Eclipse Temurin** | **17.0.21.1+2, 21.0.13.1+2, 25.0.5.1+2, 27.0.1.1+4** | Adoptium 공지 11/18. Docker Hub `eclipse-temurin:17.0.21.1_2-jdk(-jammy)` 11/20 게시 (11/23 확인). 플랫폼별 상태: adoptium/temurin#326 |
+| Corretto, Zulu | released | 11/18 확인 |
+| Microsoft, RHEL | 11/18 시점 pending | **재확인 필요** |
+
+주의: **`17.0.21`(+9 등) 기본 빌드는 미수정**이다. 반드시 `.1` 빌드인지 확인한다. 컨테이너 이미지는 태그가 아니라 실제 `java -version`으로 확인한다.
+
 **조치 순서**:
 1. **17.0.21.1 (또는 각 라인 .1) 업그레이드 최우선**
 2. 패치 적용 전 서비스는 §4-E (`-XX:-UseBASE64Intrinsics`) — 성능 영향 거의 없음,
@@ -236,8 +294,8 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 |---|---|
 | Java 사용 여부·버전 | §1 (17.0.6~17.0.21.0.3 = CVE-2026-114938 영향) |
 | 취약점 정보 | **CVE-2026-114938 = Base64 AVX-512 assembly OOB, hotspot/compiler, CVSS 8.1(v3.1)** — 상세: `KISA-REPLY-2026-11-20.md` |
-| 영향 시스템 | §1 인벤토리 × §2 외부 노출 교차 |
-| 조치계획 | §4-E `-XX:-UseBASE64Intrinsics`(임시, 성능 영향 극히 제한) → **17.0.21.1 업그레이드(근본)** |
+| 영향 시스템 | §0-1 조건(VBMI CPU 포함) × §1 인벤토리 × §2 외부 노출 교차 |
+| 조치계획 | §4-E `-XX:-UseBASE64Intrinsics`(임시, 성능 영향 극히 제한; 불가 시 §4-E2 `-XX:UseAVX=2`) → **17.0.21.1 업그레이드(근본)**. 적용 후 `jcmd VM.flags`로 실행 프로세스 확인 |
 
 ## 8. 한계 (정직)
 

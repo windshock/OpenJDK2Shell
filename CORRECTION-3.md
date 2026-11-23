@@ -139,6 +139,20 @@ pad1/pad2 모두 store 위치가 같으므로 canary 접촉 범위도 같다 (�
 
 점검 결과: `WAS-LOG-CRASH-ANALYSIS`의 "G1 CM이 여기서 사망" 등 G1 프레임 서술은 **같은 run의 캐너리 손상 관측과 함께** 쓰였다. 그래서 단독 인과 주장은 아니다. 다만 원칙을 명시하는 주석을 추가한다: G1/GC 프레임 크래시만으로 원인 컴포넌트를 확정하지 않는다. Adoptium support#1480(6월, Parallel GC 운영 크래시)은 "운영 결함 선행 기록"으로만 인용하고 공격 악용 사례로 분류하지 않는다.
 
+### C-10. CPU 조건 — "AVX-512VL+BW = 기본 취약" 과잉 (트랙 D 중 발견)
+
+정정 전 원문:
+- `KISA-REPLY` §3: "⇒ **AVX-512VL+BW CPU(AMD EPYC Genoa 등)에서는 기본 활성 = 기본 취약**"
+- `DEFENDER-GUIDE` §4-E: "에르고노믹스 동적 활성 → **AVX-512 서버는 기본 취약**"
+- `OPS-SHARING` §5: "**AVX-512VL+BW CPU**에서 기본 활성 (에르고노믹스) — 최신 서버일수록 기본 취약"
+- `DEFENDER-GUIDE` §1: "(hotspot/compiler, 8·11·17·21·25·27 전 라인)"
+
+**정정:** `vm_version_x86.cpp`는 VL+BW에서 `UseBASE64Intrinsics`를 켠다. 그러나 `stubGenerator_x86_64.cpp`의
+취약 벡터 경로(L_process64/L_finalBit)는 `supports_avx512_vbmi() && supports_avx512bw()`일 때만 생성된다
+(jdk-17.0.21-ga 재확인). VBMI가 없으면 같은 스텁이 brute-force 경로만 갖는다. → 기본 취약 조건은 **VBMI+BW**이다.
+같은 블록의 `cmpl(length, 128); jcc(lessEqual, L_bruteForce)`가 JDK 17 최소 트리거 129자의 소스 근거다.
+표준 OpenJDK 8/11은 무영향(8 Performance Pack 제외)이며, 이는 KISA-REPLY §2에 이미 기록돼 있었다. DEFENDER-GUIDE §1만 과잉 표기였다.
+
 ## 2. 정정이 바꾸지 않는 것
 
 - OOB 쓰기 존재, 취약 ON=손상 / 완화 OFF=CLEAN / 수정 빌드=CLEAN 대조 결과 (판정 자체는 유효)

@@ -48,7 +48,9 @@
 **활성 메커니즘 (소스 검증)**:
 - `src/hotspot/share/runtime/globals.hpp`: `product(bool, UseBASE64Intrinsics, false, ...)` — 정적 기본값 **false**
 - `src/hotspot/cpu/x86/vm_version_x86.cpp:951-954`: **CPU 에르고노믹스** — `UseAVX>2 && avx512vl && avx512bw`이면 `FLAG_IS_DEFAULT`인 경우 `true`로 동적 활성화
-- ⇒ **AVX-512VL+BW CPU(AMD EPYC Genoa 등)에서는 기본 활성 = 기본 취약**
+- ⇒ AVX-512VL+BW CPU에서 intrinsic 기본 활성. 단 취약 벡터 경로는 `stubGenerator_x86_64.cpp`에서
+  `supports_avx512_vbmi() && supports_avx512bw()`일 때만 생성 → **VBMI 지원 CPU(Intel Ice Lake+, AMD Zen4+ — EPYC Genoa 등)가 기본 취약**.
+  VBMI 없는 AVX-512(Skylake-SP·Cascade Lake)는 intrinsic이 켜져도 취약 경로 미생성 (11/23 정정 — CORRECTION-3 C-10)
 - `-XX:-UseBASE64Intrinsics`는 명시 플래그 → 에르고노믹스 무시(`FLAG_IS_DEFAULT` false) → 모든 CPU에서 intrinsic 차단
 - 비 AVX-512 CPU에서는 명시 `+` 플래그도 에르고노믹스가 강제 해제(경고 출력)
 
@@ -67,11 +69,14 @@
 
 ## 5. 조치 (KISA 양식 순서)
 
-1. **근본**: 17.0.21.1 (라인별 .1) 업그레이드 — JDK-8393212 포함 빌드
+1. **근본**: 17.0.21.1 (라인별 .1) 업그레이드 — JDK-8393212 포함 빌드 (Temurin 17.0.21.1+2 등, §2)
 2. **임시(패치 전)**: `JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"` — 성능 영향 극히 제한
    (intrinsic 꺼짐 → Java 스칼라 경로 fallback; C2 비활성(TieredStopAtLevel=1)과 달리
    전체 JIT 성능 저하 없음. 이 때문에 §4-E C2 비활성은 임시 완화에서 제외 권장)
    **실효 대조 실험으로 입증** (취약빌드 OOB 관측 vs 플래그 OFF CLEAN — 11/18)
+   - 대안(광역): `-XX:UseAVX=2` — Base64 intrinsic 에르고노믹스 조건(`UseAVX>2`)을 깨지만 AVX-512 최적화 전체 포기
+   - 적용 후 **재기동 + `jcmd <pid> VM.flags -all`로 실행 프로세스에서 확인**
+   - 참고: HTTP 버전(HTTP/2 사용 여부)은 영향 조건이 아님 — HTTP/1.1 전용 서버에서 크래시 실측(11/23, DEFENDER-GUIDE §0-1)
 3. **탐지**: 실패한 OOB 시도 → hs_err_pid*.log (SIGSEGV), JFR ObjectAllocationSample 이상,
    Base64 디코드 후 예상 길이 불일치/히프 커럽션 징후. 실측에서 성공한 OOB 직후
    JVM이 SIGABRT로 사망(뭉개진 헤더 접촉) — **갑자기 죽는 Java 프로세스 + hs_err/코어**
