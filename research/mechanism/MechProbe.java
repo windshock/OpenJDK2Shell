@@ -10,9 +10,9 @@ import jdk.internal.misc.Unsafe;
 
 /**
  * MechProbe — CVE-2026-114938 INTERMEDIATE-MECHANISM confirmation (diagnostic/forensic).
- *   Scope: observe OOB write -> adjacent live object HEADER corruption, byte-exact, on the
- *   real vulnerable build (Method A). NO value/sign control, NO read/write primitive, NO
- *   disclosure, NO code execution. See research/mechanism/MECH-PLAN.md.
+ *   Measurement scope: OOB write -> adjacent live object HEADER corruption, byte-exact, on
+ *   the real vulnerable build (Method A). Out of measurement scope: value/sign control,
+ *   read/write primitive, disclosure, code execution. See research/mechanism/MECH-PLAN.md.
  *
  *   Reuses OobCanary's proven humongous gap grooming verbatim; replaces the length-only scan
  *   with a full header snapshot/diff via jdk.internal.misc.Unsafe:
