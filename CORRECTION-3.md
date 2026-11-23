@@ -153,6 +153,18 @@ pad1/pad2 모두 store 위치가 같으므로 canary 접촉 범위도 같다 (�
 같은 블록의 `cmpl(length, 128); jcc(lessEqual, L_bruteForce)`가 JDK 17 최소 트리거 129자의 소스 근거다.
 표준 OpenJDK 8/11은 무영향(8 Performance Pack 제외)이며, 이는 KISA-REPLY §2에 이미 기록돼 있었다. DEFENDER-GUIDE §1만 과잉 표기였다.
 
+### C-11. DoS / 정보 유출 / Java4Shell RCE / 역직렬화 RCE 구별 (Issue #1 본문 §5 체크리스트)
+
+정정 전 원문:
+- `exploit/E2E-EXPLOIT-SUITE.md` 제목: "E2E Exploit Suite — OpenJDK 17.0.6~17.0.20 무인증 RCE"
+- 같은 문서: "→ /health 응답 두절 → PWNED", "판정: attacker exit 42 = PWNED (원격 무인증으로 victim JVM 사망 유도 성공)", 체인 4 제목 "… PWNED", 체인 1+ 제목 "… (웹셸 폼) PWNED"
+- `HANDOFF.md` §1: "분석 → 실증 → 무기화 → 방어 가이드 → OOB 직접 관측 → 원격 E2E PWNED(5회 재현)", §9: "체인 4: 실앱 E2E (HBase REST 기본 설치 PWNED ×2)", "(7회, PWNED 5회) / … (실앱 PWNED 2회)"
+- `OPS-SHARING-2026-11-18.md` §4: "판정 스크립트 exit 42 = PWNED."
+- `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md`: "근거: E2E 실증 7회 중 PWNED 5회의 victim 로그"
+- `ESCALATION-STATUS-2026-11-18.md` 제목: "… OOB → RCE 승격 (2026-11-18 심야)", §1: "OOB → 웹셸 승격 체인을 구축했으며,"
+
+**정정:** "PWNED"는 체인 3·4(Java4Shell)에서는 **victim JVM 사망 = DoS** 판정 라벨이다. 코드 실행은 체인 1·2·1+(역직렬화 → TemplatesImpl)에서만 실측했고, 이는 **CVE-2026-114938과 별개 취약 조건**이다(serialFilter=null, add-opens/exports). Java4Shell의 정보 유출과 코드 실행은 이 저장소에서 입증되지 않았다. README에 결과 분류표를 신설했다. 스크립트 판정 문자열(exit 42 = PWNED)과 원시 로그는 수정하지 않는다.
+
 ## 2. 정정이 바꾸지 않는 것
 
 - OOB 쓰기 존재, 취약 ON=손상 / 완화 OFF=CLEAN / 수정 빌드=CLEAN 대조 결과 (판정 자체는 유효)

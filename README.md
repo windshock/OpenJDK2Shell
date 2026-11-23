@@ -6,6 +6,18 @@ NCSC 공지(2026-11-16, "OpenJDK Java 17.0.6 이상, 인증 없는 RCE, CVSS 9.2
 Oracle 패치 공개 예정")에 대응해, 패치가 공개되는 즉시 수정 내용을 확인하기 위한 모니터링
 환경이다. **현재(작성 시점) 이번 취약점의 수정 코드는 공개 저장소에 아직 없다.**
 
+## 결과 분류 (2026-11-23 — 이 표가 최신 판정)
+
+| 범주 | 이 저장소의 판정 | 근거 |
+|---|---|---|
+| Java4Shell OOB 쓰기 | **실측** — 인접 객체 헤더 length 손상 관측, 완화·수정 빌드에서 CLEAN | `OOB-OBSERVATION-2026-11-18.md`, `CORRECTION-3.md` |
+| Java4Shell → JVM 크래시 (DoS) | **실측 + 인과 확인** — 취약 6/10 vs 패치·완화·정상 입력 0/10 | `research/RESULTS-2026-11-23.md` |
+| Java4Shell → 정보 유출 | **입증 안 됨** (시도는 미달, 이후 측정 범위 밖) | `ESCALATION-STATUS-2026-11-18.md` |
+| Java4Shell → 코드 실행 (RCE) | **입증 안 됨.** 외부 보고는 REPORTED (Calif·Hadrian·VulnCheck) | `CORRECTION-3.md` C-7 |
+| 역직렬화 체인 (RMI/LDAP → TemplatesImpl) 코드 실행 | **실측** — 단 CVE-2026-114938과 **별개**, serialFilter=null·add-opens/exports 조건 | `exploit/E2E-EXPLOIT-SUITE.md` 체인 1·2·1+ |
+
+문서 곳곳의 "PWNED"는 체인 3·4(Java4Shell)에서는 **JVM 사망(DoS)**을 뜻한다 (CORRECTION-3 C-11).
+
 ## OpenJDK가 보안 패치를 공개해 온 방식 (jdk17u 이력으로 확인)
 
 공개 저장소 `openjdk/jdk17u`의 과거 릴리스를 직접 확인한 결과.

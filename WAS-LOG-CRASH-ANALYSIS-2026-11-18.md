@@ -6,7 +6,7 @@
 작성: 2026-11-18 · 대상: 관제/SOC/IR · 목적: **네트워크 pcap 없이도**
 WAS(애플리케이션) 로그 + 크래시 아티팩트만으로 침해를 식별할 수 있음을 실증.
 
-근거: E2E 실증 7회 중 PWNED 5회의 victim 로그 + hs_err + (신규 수집) full hs_err·GC 로그.
+근거: E2E 실증 7회 중 PWNED(= JVM 사망, DoS) 5회의 victim 로그 + hs_err + (신규 수집) full hs_err·GC 로그.
 모든 관측은 DFIRtx dev (EPYC Genoa, temurin 17.0.8, G1, 1g 힙) 기준.
 
 ---

@@ -55,7 +55,7 @@ wireshark/tshark 예: `tshark -r j4s-e2e-vuln-attacker-full.pcap.gz -Y "http.req
 | 4~5 | vuln | **PWNED ×2** (재현성; SEGV_ACCERR / SI_KERNEL 변형) |
 | 6~7 | vuln + pcap | **PWNED ×2** + 관제용 pcap 확보 |
 
-판정 스크립트 exit 42 = PWNED. 공격 원장: `ops/e2e_java4shell_attacker.sh`,
+판정 스크립트 exit 42 = PWNED (**= victim JVM 사망, DoS.** 정보 유출·코드 실행 아님 — CORRECTION-3 C-11). 공격 원장: `ops/e2e_java4shell_attacker.sh`,
 victim 서비스: `exploit/src/Java4ShellE2EVictim.java` (업로드 디코드 표면 모델),
 러너: `exploit/e2e_java4shell.sh vuln|mitig [pcap]`.
 

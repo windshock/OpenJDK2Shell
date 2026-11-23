@@ -3,7 +3,7 @@
 > **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
 
 
-작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E PWNED + 관제 공유 pcap)
+작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E JVM 크래시(DoS) 재현 + 관제 공유 pcap)
 
 ## 0. 현재 상태 (2026-11-23 17:10 KST 갱신 — 이 절이 최신)
 
@@ -22,7 +22,7 @@
 ## 1. 프로젝트 한 줄 요약
 
 OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대응 프로젝트.
-분석 → 실증 → 무기화 → 방어 가이드 → **OOB 직접 관측 → 원격 E2E PWNED(5회 재현) →
+분석 → 실증 → 무기화(역직렬화 체인 — 별개 취약점) → 방어 가이드 → **OOB 직접 관측 → 원격 E2E JVM 크래시(DoS) 5회 재현 →
 관제 공유용 pcap → KISA 회신 초안**까지 전부 완료. §6 남은 과제 없음 (§6-2 Keycloak은
 플러드 방식이 비현실적으로 느려 중단·부분 로그만 보존 — E2E victim 모델로 대체 실증).
 
@@ -106,12 +106,12 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | 자산 | 위치 |
 |---|---|
 | **E2E 체인 3 문서** | `exploit/E2E-EXPLOIT-SUITE.md` (체인 3 절) |
-| **★ 체인 4: 실앱 E2E (HBase REST 기본 설치 PWNED ×2)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 4 절 — `ops/hbase_e2e_setup.sh`·`ops/hbase_e2e_attack.py`·`exploit/hbase_e2e.sh` |
+| **★ 체인 4: 실앱 E2E (HBase REST 기본 설치 JVM 크래시·DoS ×2)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 4 절 — `ops/hbase_e2e_setup.sh`·`ops/hbase_e2e_attack.py`·`exploit/hbase_e2e.sh` |
 | **관제 공유 문서** | `OPS-SHARING-2026-11-18.md` — 와이어 시그니처·탐지룰·pcap 목차 |
 | **WAS 로그·크래시 덤프 패턴** | `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md` — 앱로그 A1~A4 룰, hs_err 서명, GC 로그 룰 |
 | **pcap (공유용)** | `exploit/results/pcap/j4s-e2e-vuln-attacker-full.pcap.gz` (13초 전체, 트리거+사망 RST), `victim-flood.pcap.gz`, `soc-r1.pcap` |
 | E2E 코드 | `exploit/src/Java4ShellE2EVictim.java` + `ops/e2e_java4shell_attacker.sh` + `exploit/e2e_java4shell.sh` |
-| E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회, PWNED 5회) / `results/hbase_*_vuln.log` (실앱 PWNED 2회) |
+| E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회, JVM 크래시(DoS) 5회) / `results/hbase_*_vuln.log` (실앱 JVM 크래시 2회) |
 | 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
 
 **레포 상태: PUBLIC** (11/18 전환 — `kerberosjoo27@gmail.com`만 마스킹 후 공개).
