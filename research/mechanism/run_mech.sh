@@ -72,6 +72,34 @@ status)
 pull)
   mkdir -p "$HERE/out"; for p in mech-a build-b; do $K get pod $p >/dev/null 2>&1 && $K logs $p > "$HERE/out/$p.log" 2>&1 && echo "pulled $p -> out/$p.log"; done
   ;;
+vary)
+  ensure_ns
+  i=0
+  for ch in a b q; do
+    node=$(printf "dfirtx-worker-dev0%d" $((3 + i))); i=$((i+1))
+    CH=$(echo "$ch" | tr a-z A-Z)
+    cat <<YAML | kubectl apply -f - >/dev/null
+apiVersion: v1
+kind: Pod
+metadata: {name: vary-$ch, namespace: $NS}
+spec:
+  nodeName: $node
+  restartPolicy: Never
+  containers:
+  - name: c
+    image: $IMG
+    command: ["bash","-c",
+      "set -e; mkdir /o && javac --add-exports java.base/jdk.internal.misc=ALL-UNNAMED -d /o /v/MechProbe.java; java $GROOM -cp /o MechProbe gap pad2 140 /tmp/gc.log $CH 2>&1 | grep -E 'length :|INPUT-DEPENDENCE|VERDICT' || true; echo DONE-$CH; sleep 180"]
+    resources: {requests: {cpu: '3', memory: 2500Mi}, limits: {cpu: '3', memory: 3Gi}}
+    volumeMounts: [{name: v, mountPath: /v}]
+  volumes: [{name: v, configMap: {name: mech-src}}]
+YAML
+  done
+  echo "vary pods applied (a,b,q) → ./run_mech.sh varystatus"
+  ;;
+varystatus)
+  for ch in a b q; do echo "== vary-$ch ($($K get pod vary-$ch -o jsonpath='{.status.phase}' 2>/dev/null))"; $K logs vary-$ch 2>/dev/null | grep -E 'length :|INPUT-DEP|VERDICT|MEXIT'; done
+  ;;
 teardown) kubectl delete ns $NS --ignore-not-found --wait=false >/dev/null 2>&1; echo NS-CLEAN ;;
 *) sed -n 2,2p "$0"; exit 2 ;;
 esac

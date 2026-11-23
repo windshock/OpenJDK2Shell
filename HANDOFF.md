@@ -16,6 +16,10 @@
   `python3 research/analysis/analyze.py research/data/main-2026-11-23/attempts_merged.jsonl` · `research/.venv/bin/python research/analysis/crosscheck.py …`
 - 클러스터: 워커 dev01~06 (dev03~06은 11/23 16:10 가입, 전부 EPYC-Genoa VBMI). 실험 네임스페이스 `j4s-research*` 전부 삭제됨.
   재실험 시 `research/lab/lab.sh deploy|run|status|pull|stop` (NS·NODE 환경변수) + `research/lab/coordinator.py` (PENDING·LANES_EXTRA)
+- **중간 기전 확인 완료** → `research/mechanism/MECH-RESULTS.md`: OOB 64B store 꼬리 48B가 인접 헤더
+  (mark+klass+length+body)를 덮음(Method A 실측), GC가 손상 klass 따라가다 치명(Method B fastdebug 어서션).
+  유출: fill 문자 축으로는 length 제어 안 됨(vary 실험 기각), 정렬 축은 미시도(승격 범위 밖) → UNESTABLISHED
+- **재사용 인덱스:** `research/README.md` — lab/coordinator/analysis/mechanism 재실행 명령 전부
 - **남은 결정 (PI):** RESULTS §6 — SCOPE 마감 권고 / 선택지: episode 수준 배치 가설 새 사전등록
 - 아래 §1~§9는 11/18 기준 기록 — 바이트 수·Keycloak·TLAB 서술은 CORRECTION-3로 정정됨
 
