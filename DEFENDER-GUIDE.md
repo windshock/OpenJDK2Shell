@@ -1,5 +1,8 @@
 # 방어자 가이드 — OpenJDK 17.0.6+ Base64 OOB (Java4Shell) 대응 (v4 — 진범 확정 반영)
 
+> **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+
+
 작성일: 2026-11-17 · 갱신: 2026-11-18 (v4 — CVE-2026-114938 = Base64 AVX-512 assembly OOB 확정)
 · 대상: 인프라·SOC·서비스 담당
 근거: KISA ISMS인증팀 공문(11/17) + OpenJDK Advisory 2026/11/17 + jdk17u 소스 검증(11/18)
@@ -254,7 +257,7 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
   오인 — 해당 테스트는 **JDK-8389989 별개 계산정확성 버그**(캐너리 FIRED)이고,
   E2E 원격 RCE(11/18)는 **TemplatesImpl 체인**(별개 취약점, add-exports 조건)이다.
 - **OOB 직접 관측 완료 (11/18)**: CVE-2026-114938의 OOB 쓰기를 힙 커널리 기법으로
-  Java 레벨에서 직접 관측 — canary 헤더 length 필드 뭉개짐(62/63B 스토어),
+  Java 레벨에서 직접 관측 — canary 헤더 length 필드 뭉개짐(64B store, 논리 초과 62/63B — CORRECTION-3 C-2),
   `-XX:-UseBASE64Intrinsics` 대조 CLEAN(**완화 실효 입증**).
   상세: `OOB-OBSERVATION-2026-11-18.md`. 성공한 OOB 직후 JVM SIGABRT —
   **급사하는 Java 프로세스 + hs_err/코어 덤프가 운영 탐지 신호**.

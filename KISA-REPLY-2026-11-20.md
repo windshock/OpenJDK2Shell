@@ -1,5 +1,8 @@
 # KISA 회신 초안 — CVE-2026-114938 (Java4Shell)
 
+> **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+
+
 작성: 2026-11-18 · 회신 기한: 2026-11-20
 모든 항목 소스 레벨 검증 완료 (jdk17u 클론, blobless 경로 한정 git show 기준).
 
@@ -33,9 +36,12 @@
   2026-10-13 작성 — 엠바고 후 11/17 공개). 17u backport가 위 8ea73158af.
 - **Java 8**: 일반 8u는 디코드 intrinsic이 없어 무영향 — 단 **Oracle Java SE 8 Performance
   Pack(8u511b33-perf)** 만 취약 코드 포함, 8u513-perf에서 수정 (회신 시 8 라인 서술 주의).
-- 벤더 수정 현황(11/18): Oracle CSPU(17.0.21.1 등)·Corretto·Zulu released,
-  Temurin/Microsoft/RHEL pending, Debian stable 취약 — 회신 시 벤더별 .1 빌드 명시 요망
+- 벤더 수정 현황(11/18 확인): Oracle CSPU(17.0.21.1 등)·Corretto·Zulu released,
+  Microsoft/RHEL pending(11/18 기준, 재확인 필요), Debian stable 취약 — 회신 시 벤더별 .1 빌드 명시 요망
   (`17.0.21` base 빌드는 미수정).
+- **Temurin (11/23 갱신)**: Adoptium 11/18 공지 — 수정 빌드 17.0.21.1+2 / 21.0.13.1+2 / 25.0.5.1+2 /
+  27.0.1.1+4. Docker Hub `eclipse-temurin:17.0.21.1_2-jdk(-jammy)` 11/20 게시 확인(11/23).
+  플랫폼·채널별 상태는 adoptium/temurin#326에서 개별 확인 (일괄 완료로 일반화하지 않음).
 
 ## 3. 완화 플래그: `-XX:-UseBASE64Intrinsics` (product, 전 아키텍처 유효)
 
@@ -51,8 +57,9 @@
 - 입력: Base64 디코드 입력 끝에 4바이트 미만 패딩 테일 (예: `A`×128 + `=` = 129바이트)
 - 경로: `java.util.Base64.getDecoder().decode()` → C2 intrinsic → AVX-512 스텁 `generate_base64_decodeBlock`
 - 결함: `L_finalBit` 테일(1~63바이트) 처리에서 length<4 패딩 조각의 `output_size`가
-  `0 - 패드수`로 **음수 언더플로** → `bzhiq`의 mod-64 해석으로 출력 마스크가
-  62/63비트로 부풀어 masked store가 dst 끝에서 62/63바이트 쓰기 (11/18 스텁 소스 분석 확정)
+  `0 - 패드수`로 **음수 언더플로** → `bzhiq`가 index 하위 8비트(255/254 ≥ 64)를 받아 마스크를
+  지우지 않음(all-ones) → masked store가 현재 출력 위치에서 **64바이트** 쓰기, 그중
+  계산된 dst 끝을 넘는 양은 62B(패드 1) / 63B(패드 2) (11/23 정정 — `CORRECTION-3.md` C-1·C-2)
 - **OOB 직접 관측 완료 (11/18, DFIRtx/EPYC Genoa)**: 힙 커널리 기법으로 취약 빌드에서
   canary 헤더 length 필드 뭉개짐 관측, `-XX:-UseBASE64Intrinsics`에서 동일 실험 CLEAN
   — 상세: `OOB-OBSERVATION-2026-11-18.md`

@@ -1,5 +1,8 @@
 # 스케일업 상태 보고 — CVE-2026-114938 OOB → RCE 승격 (2026-11-18 심야)
 
+> **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+
+
 ## 1. 요약
 
 실앱(Spring Boot/Tomcat, JDK 17.0.8)에서 OOB → 웹셸 승격 체인을 구축했으며,
@@ -103,12 +106,13 @@ dst를 128B로 잡아 쓰기(dst+48..112)가 **배열 내부에 전부 포함** 
 작은 dst(65B 트리거 → 50B)의 쓰기는 **할당되지 않은 TLAB 미래 영역**에 떨어진다.
 JVM은 이후 그 주소에 객체를 할당할 때 **헤더(mark/klass/length)를 새로 기록**하므로
 OOB로 쓴 파손 헤더는 **할당 시점에 정상 헤더로 덮여 소거**된다. 바디도 앱 내용으로 덮임.
-→ 실측과 완전 일치: 150발 트리거 + GC 6회 전부 생존, bleed 0.
-→ **결론: Basic auth/JWT/SAML 헤더류(작은 dst) 표면은 본 CVE의 승격이 구조적으로 불가.**
+→ 이 랩 실측과 정합(설명 가설): 150발 트리거 + GC 6회 전부 생존, bleed 0.
+→ ~~결론: Basic auth/JWT/SAML 헤더류(작은 dst) 표면은 본 CVE의 승격이 구조적으로 불가.~~
+→ **(11/23 정정, CORRECTION-3 C-6)** 이 랩 조건(Spring/Tomcat, G1, 1.25GB, 이 앱의 할당 패턴)에서 작은 dst 150발이 **음성**이었다는 관측이다. TLAB 소거는 이 관측과 맞는 설명 가설이며, TLAB 밖 할당·TLAB 경계·다른 GC/앱에 대한 불가능성은 입증하지 않았다.
    이 표면의 영향 = DoS(파손은 소거되나 쓰기 자체는 매번 발생 — GC/런타임 타이밍에 따른
    잔여 위험만 존재).
 
-### 7-3. 승격 가능 유일 경로 재확인
+### 7-3. 이 랩에서 손상이 관측된 경로 (11/23 정정: "유일 경로" 표현 철회)
 **대형 dst(POST body decode → old-gen humongous)가 인접 live 객체(기존 헤더)를 때리는 것**
 — HBase/Synthetic에서 length 파손 실측 완료. 남은 변수는 G1 free-list 배치 결정론(§6-1).
 표적 스코핑: "upload/attach/캐시형 decode 엔드포인트(post-auth 무관, body 제한 완화 조건)"
@@ -118,7 +122,7 @@ OOB로 쓴 파손 헤더는 **할당 시점에 정상 헤더로 덮여 소거**�
 
 | 표면 | dst 크기 | 파손 지속성 | 승격 |
 |---|---|---|---|
-| HTTP Basic/JWT/SAML (헤더, ≤8KB) | ≤6KB (TLAB) | 소거됨 (할당 시 헤더 재기록) | **불가 (DoS만)** |
+| HTTP Basic/JWT/SAML (헤더, ≤8KB) | ≤6KB (TLAB) | 이 랩에서는 소거 관측 (설명 가설) | **이 랩 조건 음성** — 일반 불가 주장 철회 (C-6). 외부: Hadrian Basic 경로 크래시 보고(REPORTED) |
 | POST body decode (업로드/캐시, MB급) | MB급 (humongous, old-gen) | **지속** (인접 live 객체 헤더 파손) | **가능 (배치 결정론 남음)** |
 
 ## 9. 포화 실험 결과 — 실앱 앱-프레임 SIGSEGV 확정 (11/18 심야 4차)
@@ -145,4 +149,4 @@ Problematic frame: J 7347 c1 lab.AvatarApp.status()  ← 우리 앱 코드 (C1 �
 
 **현재 확정 체인 (실앱 Spring/Tomcat, 무인증 POST)**:
 fill(700MB 정상 업로드로 힙 70% 포화) → drop(6R gap) → trigger(패딩 b64) →
-OOB 62B → **캐시 배열 헤더 파손 지속** → 앱 코드 SIGSEGV → 프로세스 사망.
+OOB(64B store, 논리 초과 63B) → **캐시 배열 헤더 파손 지속** → 앱 코드 SIGSEGV → 프로세스 사망.

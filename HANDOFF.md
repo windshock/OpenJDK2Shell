@@ -1,5 +1,8 @@
 # HANDOFF — 신규 세션 인계 문서
 
+> **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+
+
 작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E PWNED + 관제 공유 pcap)
 
 ## 1. 프로젝트 한 줄 요약
@@ -63,7 +66,7 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 
 ## 6. 남은 과제 (2026-11-18 저녁 기준 — §6 전 과제 완수)
 
-1. ~~OOB 실측 승격~~ — 완료 (`OOB-OBSERVATION-2026-11-18.md`, 62/63B 관측)
+1. ~~OOB 실측 승격~~ — 완료 (`OOB-OBSERVATION-2026-11-18.md`, 인접 헤더 손상 관측; 바이트 수는 CORRECTION-3 C-2)
 2. ~~애플리케이션 표적~~ — Keycloak 플러드는 웜 병목으로 중단(부분 로그 보존),
    **E2E victim 모델로 대체 실증 완료** (업로드 디코드 표면)
 3. ~~완화 3중 대조~~ — **완결**: 취약 ON=OOB / 완화 OFF=CLEAN /
@@ -72,8 +75,8 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 4. ~~DEFENDER-GUIDE v4~~ — 완료
 5. ~~KISA 회신 초안~~ — 완료 (`KISA-REPLY-2026-11-20.md`, 11/20 회신 전 검토만 남음)
 
-**후속 후보 (신규 작업)**: Keycloak JWT 경로 유효 트리거 설계(base64url은 패딩 미허용 —
-`getUrlDecoder`는 intrinsic 스텁 공유하되 트리거 형태 재설계 필요), 타 라인(8·11·21)
+**후속 후보 (신규 작업)**: JWT 라이브러리별 패딩 처리·디코더 도달성 확인(11/23 정정: base64url도
+`=` 패딩을 허용하고 스텁은 URL 모드에서도 같은 store 실행 — CORRECTION-3 C-5, 계획 E-2), 타 라인(8·11·21)
 하한 아키폴로지 스폿 체크, hs_err 기반 탐지룰 튜닝.
 
 ## 7. 신규 세션 시작 명령
@@ -98,8 +101,7 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
 
 **레포 상태: PUBLIC** (11/18 전환 — `kerberosjoo27@gmail.com`만 마스킹 후 공개).
-Keycloak은 본 CVE 표적 부적합 판정 (E2E-SUITE 체인 4-한계: base64url 무스토어·
-SAML 커스텀 디코더·헤더 한계). 실앱 표적 = **HBase REST (ScannerModel JDK Base64)**.
+~~Keycloak은 본 CVE 표적 부적합 판정~~ (11/23 철회 — CORRECTION-3 C-5·C-6). 실앱 표적 = **HBase REST (ScannerModel JDK Base64)**.
 
 ## 8. 운영 메모
 

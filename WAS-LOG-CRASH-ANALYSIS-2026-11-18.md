@@ -1,5 +1,8 @@
 # WAS 로그·크래시 덤프 패턴 분석 — CVE-2026-114938 (Java4Shell)
 
+> **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+
+
 작성: 2026-11-18 · 대상: 관제/SOC/IR · 목적: **네트워크 pcap 없이도**
 WAS(애플리케이션) 로그 + 크래시 아티팩트만으로 침해를 식별할 수 있음을 실증.
 
@@ -105,7 +108,7 @@ full hs_err(194KB)의 Heap Regions 테이블을 humongous 블록별로 요약하
 | 361|HC| 100%|
 | 362|HC| 100%|
 | 363|HC|  99%| top=0x...d6bffff8  ← dst 꼬리: 객체 끝이 리전 끝 8B 전
-| 364|HS| 100%| ← ★ 62B OOB 쓰기가 때린 다음 필러의 헤더 (G1 CM이 여기서 사망)
+| 364|HS| 100%| ← ★ OOB 쓰기(64B store, 논리 초과 63B)가 때린 다음 필러의 헤더 (G1 CM이 여기서 사망)
 | 365~368|HC|   ←   (파손된 5리전 객체의 나머지)
 ```
 
@@ -164,12 +167,14 @@ hs_err 작성 자체가 2차 SIGSEGV로 일부 실패. **커럽션이 에러 리
 canary.length=-1503028570 (expected 5242864) ★ HEADER LENGTH FIELD SMASHED ★
 ★★★ OOB WRITE OBSERVED AT JAVA LEVEL — canary[71] corrupted ★★★
 VERDICT: OOB-OBSERVED (62B write)  →  관측 직후 JVM SIGSEGV→abort, exit 134
+(괄호 바이트 수는 당시 도구 출력 원문 — CORRECTION-3 C-2)
 ```
 
 - 파손된 length 필드 값(-1503028570 = 0xA6536...)은 **디코드 가비지 패턴** —
   공격 입력('A')이 스텁의 유효문자 병합을 통과해 만든 값. 힙 덤프 분석 시
   파손 객체 헤더의 이런 "불가능한 length"가 직접 단서.
-- 1MiB/2MiB 심층 오프셋 온전 → **파손이 62~63B로 국한** — 광역 커럽션 아님.
+- 1MiB/2MiB 심층 오프셋 온전 → 원거리 광역 파손 없음. 쓰기 폭 상한은 이것으로 확정되지 않음 (CORRECTION-3 C-3).
+- 크래시 프레임(G1CM)은 같은 run의 캐너리 손상 관측과 **함께** 해석한 것이다. G1 프레임 단독으로 원인 컴포넌트를 확정하지 않는다 (C-9).
 
 ## 5. 요약 — 관제/IR 3층 관측 포인트
 
