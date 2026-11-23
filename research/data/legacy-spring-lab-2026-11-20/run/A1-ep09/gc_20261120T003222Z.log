@@ -1,0 +1,637 @@
+[2026-11-20T00:32:22.609+0000][0.005s][info][gc] Using G1
+[2026-11-20T00:32:23.109+0000][0.506s][info][gc,heap] GC(0) Eden regions: 64->0(60)
+[2026-11-20T00:32:23.109+0000][0.506s][info][gc,heap] GC(0) Survivor regions: 0->4(8)
+[2026-11-20T00:32:23.109+0000][0.506s][info][gc,heap] GC(0) Old regions: 0->0
+[2026-11-20T00:32:23.109+0000][0.506s][info][gc,heap] GC(0) Archive regions: 2->2
+[2026-11-20T00:32:23.109+0000][0.506s][info][gc,heap] GC(0) Humongous regions: 0->0
+[2026-11-20T00:32:23.110+0000][0.506s][info][gc     ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 64M->4M(1280M) 4.466ms
+[2026-11-20T00:32:23.277+0000][0.674s][info][gc,heap] GC(1) Eden regions: 60->0(60)
+[2026-11-20T00:32:23.278+0000][0.674s][info][gc,heap] GC(1) Survivor regions: 4->6(8)
+[2026-11-20T00:32:23.278+0000][0.674s][info][gc,heap] GC(1) Old regions: 0->0
+[2026-11-20T00:32:23.278+0000][0.674s][info][gc,heap] GC(1) Archive regions: 2->2
+[2026-11-20T00:32:23.278+0000][0.674s][info][gc,heap] GC(1) Humongous regions: 0->0
+[2026-11-20T00:32:23.278+0000][0.674s][info][gc     ] GC(1) Pause Young (Normal) (G1 Evacuation Pause) 64M->6M(1280M) 3.936ms
+[2026-11-20T00:32:23.649+0000][1.045s][info][gc,heap] GC(2) Eden regions: 55->0(63)
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc,heap] GC(2) Survivor regions: 6->5(9)
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc,heap] GC(2) Old regions: 0->4
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc,heap] GC(2) Archive regions: 2->2
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc,heap] GC(2) Humongous regions: 0->0
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc     ] GC(2) Pause Young (Concurrent Start) (Metadata GC Threshold) 60M->8M(1280M) 8.681ms
+[2026-11-20T00:32:23.649+0000][1.046s][info][gc     ] GC(3) Concurrent Mark Cycle
+[2026-11-20T00:32:23.656+0000][1.053s][info][gc     ] GC(3) Pause Remark 10M->10M(1280M) 2.183ms
+[2026-11-20T00:32:23.658+0000][1.055s][info][gc     ] GC(3) Pause Cleanup 10M->10M(1280M) 0.066ms
+[2026-11-20T00:32:23.663+0000][1.060s][info][gc     ] GC(3) Concurrent Mark Cycle 14.227ms
+[2026-11-20T00:32:28.859+0000][6.256s][info][gc,heap] GC(4) Eden regions: 65->0(150)
+[2026-11-20T00:32:28.859+0000][6.256s][info][gc,heap] GC(4) Survivor regions: 5->8(9)
+[2026-11-20T00:32:28.859+0000][6.256s][info][gc,heap] GC(4) Old regions: 4->4
+[2026-11-20T00:32:28.859+0000][6.256s][info][gc,heap] GC(4) Archive regions: 2->2
+[2026-11-20T00:32:28.859+0000][6.256s][info][gc,heap] GC(4) Humongous regions: 0->0
+[2026-11-20T00:32:28.860+0000][6.256s][info][gc     ] GC(4) Pause Young (Normal) (G1 Evacuation Pause) 73M->11M(1280M) 8.658ms
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc,heap] GC(5) Eden regions: 20->0(222)
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc,heap] GC(5) Survivor regions: 8->8(20)
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc,heap] GC(5) Old regions: 4->4
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc,heap] GC(5) Archive regions: 2->2
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc,heap] GC(5) Humongous regions: 570->90
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc     ] GC(5) Pause Young (Concurrent Start) (G1 Humongous Allocation) 601M->102M(1280M) 6.631ms
+[2026-11-20T00:32:29.670+0000][7.067s][info][gc     ] GC(6) Concurrent Undo Cycle
+[2026-11-20T00:32:29.674+0000][7.071s][info][gc     ] GC(6) Concurrent Undo Cycle 3.879ms
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc,heap] GC(7) Eden regions: 6->0(511)
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc,heap] GC(7) Survivor regions: 8->8(29)
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc,heap] GC(7) Old regions: 4->4
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc,heap] GC(7) Archive regions: 2->2
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc,heap] GC(7) Humongous regions: 570->178
+[2026-11-20T00:32:29.828+0000][7.224s][info][gc     ] GC(7) Pause Young (Concurrent Start) (G1 Humongous Allocation) 587M->190M(1280M) 5.429ms
+[2026-11-20T00:32:29.828+0000][7.225s][info][gc     ] GC(8) Concurrent Undo Cycle
+[2026-11-20T00:32:29.829+0000][7.226s][info][gc     ] GC(8) Concurrent Undo Cycle 1.308ms
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc,heap] GC(9) Eden regions: 8->0(759)
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc,heap] GC(9) Survivor regions: 8->9(65)
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc,heap] GC(9) Old regions: 4->4
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc,heap] GC(9) Archive regions: 2->2
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc,heap] GC(9) Humongous regions: 566->246
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc     ] GC(9) Pause Young (Concurrent Start) (G1 Humongous Allocation) 585M->258M(1280M) 5.527ms
+[2026-11-20T00:32:29.954+0000][7.351s][info][gc     ] GC(10) Concurrent Undo Cycle
+[2026-11-20T00:32:29.955+0000][7.352s][info][gc     ] GC(10) Concurrent Undo Cycle 1.238ms
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc,heap] GC(11) Eden regions: 6->0(760)
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc,heap] GC(11) Survivor regions: 9->8(96)
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc,heap] GC(11) Old regions: 4->4
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc,heap] GC(11) Archive regions: 2->2
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc,heap] GC(11) Humongous regions: 564->284
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc     ] GC(11) Pause Young (Concurrent Start) (G1 Humongous Allocation) 582M->296M(1280M) 5.815ms
+[2026-11-20T00:32:30.068+0000][7.465s][info][gc     ] GC(12) Concurrent Undo Cycle
+[2026-11-20T00:32:30.069+0000][7.466s][info][gc     ] GC(12) Concurrent Undo Cycle 1.158ms
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc,heap] GC(13) Eden regions: 6->0(760)
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc,heap] GC(13) Survivor regions: 8->8(96)
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc,heap] GC(13) Old regions: 4->4
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc,heap] GC(13) Archive regions: 2->2
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc,heap] GC(13) Humongous regions: 566->334
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc     ] GC(13) Pause Young (Concurrent Start) (G1 Humongous Allocation) 583M->346M(1280M) 5.538ms
+[2026-11-20T00:32:30.163+0000][7.560s][info][gc     ] GC(14) Concurrent Undo Cycle
+[2026-11-20T00:32:30.165+0000][7.562s][info][gc     ] GC(14) Concurrent Undo Cycle 1.170ms
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc,heap] GC(15) Eden regions: 5->0(745)
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc,heap] GC(15) Survivor regions: 8->8(96)
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc,heap] GC(15) Old regions: 4->4
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc,heap] GC(15) Archive regions: 2->2
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc,heap] GC(15) Humongous regions: 570->378
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc     ] GC(15) Pause Young (Concurrent Start) (G1 Humongous Allocation) 586M->390M(1280M) 6.136ms
+[2026-11-20T00:32:30.243+0000][7.640s][info][gc     ] GC(16) Concurrent Undo Cycle
+[2026-11-20T00:32:30.244+0000][7.641s][info][gc     ] GC(16) Concurrent Undo Cycle 1.139ms
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc,heap] GC(17) Eden regions: 5->0(718)
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc,heap] GC(17) Survivor regions: 8->8(95)
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc,heap] GC(17) Old regions: 4->4
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc,heap] GC(17) Archive regions: 2->2
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc,heap] GC(17) Humongous regions: 568->408
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc     ] GC(17) Pause Young (Concurrent Start) (G1 Humongous Allocation) 584M->420M(1280M) 6.073ms
+[2026-11-20T00:32:30.307+0000][7.704s][info][gc     ] GC(18) Concurrent Undo Cycle
+[2026-11-20T00:32:30.308+0000][7.705s][info][gc     ] GC(18) Concurrent Undo Cycle 1.075ms
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc,heap] GC(19) Eden regions: 4->0(714)
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc,heap] GC(19) Survivor regions: 8->8(91)
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc,heap] GC(19) Old regions: 4->4
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc,heap] GC(19) Archive regions: 2->2
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc,heap] GC(19) Humongous regions: 566->414
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc     ] GC(19) Pause Young (Concurrent Start) (G1 Humongous Allocation) 582M->426M(1280M) 5.383ms
+[2026-11-20T00:32:30.368+0000][7.765s][info][gc     ] GC(20) Concurrent Undo Cycle
+[2026-11-20T00:32:30.369+0000][7.766s][info][gc     ] GC(20) Concurrent Undo Cycle 0.969ms
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc,heap] GC(21) Eden regions: 4->0(692)
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc,heap] GC(21) Survivor regions: 8->8(91)
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc,heap] GC(21) Old regions: 4->4
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc,heap] GC(21) Archive regions: 2->2
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc,heap] GC(21) Humongous regions: 566->438
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc     ] GC(21) Pause Young (Concurrent Start) (G1 Humongous Allocation) 581M->450M(1280M) 5.463ms
+[2026-11-20T00:32:30.421+0000][7.818s][info][gc     ] GC(22) Concurrent Undo Cycle
+[2026-11-20T00:32:30.422+0000][7.819s][info][gc     ] GC(22) Concurrent Undo Cycle 0.903ms
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc,heap] GC(23) Eden regions: 3->0(666)
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc,heap] GC(23) Survivor regions: 8->8(88)
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc,heap] GC(23) Old regions: 4->4
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc,heap] GC(23) Archive regions: 2->2
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc,heap] GC(23) Humongous regions: 568->464
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc     ] GC(23) Pause Young (Concurrent Start) (G1 Humongous Allocation) 583M->476M(1280M) 5.259ms
+[2026-11-20T00:32:30.466+0000][7.863s][info][gc     ] GC(24) Concurrent Undo Cycle
+[2026-11-20T00:32:30.467+0000][7.864s][info][gc     ] GC(24) Concurrent Undo Cycle 0.999ms
+[2026-11-20T00:32:30.506+0000][7.903s][info][gc,heap] GC(25) Eden regions: 3->0(648)
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc,heap] GC(25) Survivor regions: 8->8(85)
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc,heap] GC(25) Old regions: 4->4
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc,heap] GC(25) Archive regions: 2->2
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc,heap] GC(25) Humongous regions: 570->482
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc     ] GC(25) Pause Young (Concurrent Start) (G1 Humongous Allocation) 585M->494M(1280M) 4.122ms
+[2026-11-20T00:32:30.507+0000][7.903s][info][gc     ] GC(26) Concurrent Undo Cycle
+[2026-11-20T00:32:30.508+0000][7.904s][info][gc     ] GC(26) Concurrent Undo Cycle 0.965ms
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc,heap] GC(27) Eden regions: 2->0(634)
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc,heap] GC(27) Survivor regions: 8->9(82)
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc,heap] GC(27) Old regions: 4->4
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc,heap] GC(27) Archive regions: 2->2
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc,heap] GC(27) Humongous regions: 566->494
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc     ] GC(27) Pause Young (Concurrent Start) (G1 Humongous Allocation) 580M->506M(1280M) 4.270ms
+[2026-11-20T00:32:30.535+0000][7.932s][info][gc     ] GC(28) Concurrent Undo Cycle
+[2026-11-20T00:32:30.536+0000][7.933s][info][gc     ] GC(28) Concurrent Undo Cycle 0.859ms
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc,heap] GC(29) Eden regions: 2->0(625)
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc,heap] GC(29) Survivor regions: 9->7(81)
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc,heap] GC(29) Old regions: 4->5
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc,heap] GC(29) Archive regions: 2->2
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc,heap] GC(29) Humongous regions: 570->506
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc     ] GC(29) Pause Young (Concurrent Start) (G1 Humongous Allocation) 584M->518M(1280M) 4.447ms
+[2026-11-20T00:32:30.563+0000][7.960s][info][gc     ] GC(30) Concurrent Undo Cycle
+[2026-11-20T00:32:30.564+0000][7.961s][info][gc     ] GC(30) Concurrent Undo Cycle 1.184ms
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc,heap] GC(31) Eden regions: 2->0(623)
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc,heap] GC(31) Survivor regions: 7->5(79)
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc,heap] GC(31) Old regions: 5->7
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc,heap] GC(31) Archive regions: 2->2
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc,heap] GC(31) Humongous regions: 566->510
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc     ] GC(31) Pause Young (Concurrent Start) (G1 Humongous Allocation) 580M->522M(1280M) 4.110ms
+[2026-11-20T00:32:30.589+0000][7.986s][info][gc     ] GC(32) Concurrent Undo Cycle
+[2026-11-20T00:32:30.590+0000][7.987s][info][gc     ] GC(32) Concurrent Undo Cycle 0.888ms
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc,heap] GC(33) Eden regions: 2->0(611)
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc,heap] GC(33) Survivor regions: 5->1(79)
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc,heap] GC(33) Old regions: 7->11
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc,heap] GC(33) Archive regions: 2->2
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc,heap] GC(33) Humongous regions: 564->524
+[2026-11-20T00:32:30.609+0000][8.005s][info][gc     ] GC(33) Pause Young (Concurrent Start) (G1 Humongous Allocation) 577M->536M(1280M) 3.075ms
+[2026-11-20T00:32:30.609+0000][8.006s][info][gc     ] GC(34) Concurrent Undo Cycle
+[2026-11-20T00:32:30.609+0000][8.006s][info][gc     ] GC(34) Concurrent Undo Cycle 0.830ms
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc,heap] GC(35) Eden regions: 2->0(605)
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc,heap] GC(35) Survivor regions: 1->1(77)
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc,heap] GC(35) Old regions: 11->11
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc,heap] GC(35) Archive regions: 2->2
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc,heap] GC(35) Humongous regions: 562->530
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc     ] GC(35) Pause Young (Concurrent Start) (G1 Humongous Allocation) 576M->542M(1280M) 1.800ms
+[2026-11-20T00:32:30.624+0000][8.021s][info][gc     ] GC(36) Concurrent Undo Cycle
+[2026-11-20T00:32:30.625+0000][8.022s][info][gc     ] GC(36) Concurrent Undo Cycle 0.781ms
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc,heap] GC(37) Eden regions: 2->0(598)
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc,heap] GC(37) Survivor regions: 1->1(76)
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc,heap] GC(37) Old regions: 11->12
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc,heap] GC(37) Archive regions: 2->2
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc,heap] GC(37) Humongous regions: 560->536
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc     ] GC(37) Pause Young (Concurrent Start) (G1 Humongous Allocation) 573M->548M(1280M) 0.791ms
+[2026-11-20T00:32:30.637+0000][8.034s][info][gc     ] GC(38) Concurrent Undo Cycle
+[2026-11-20T00:32:30.638+0000][8.035s][info][gc     ] GC(38) Concurrent Undo Cycle 0.945ms
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc,heap] GC(39) Eden regions: 1->0(582)
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc,heap] GC(39) Survivor regions: 1->1(75)
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc,heap] GC(39) Old regions: 12->12
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc,heap] GC(39) Archive regions: 2->2
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc,heap] GC(39) Humongous regions: 560->552
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc     ] GC(39) Pause Young (Concurrent Start) (G1 Humongous Allocation) 572M->564M(1280M) 0.792ms
+[2026-11-20T00:32:30.639+0000][8.036s][info][gc     ] GC(40) Concurrent Undo Cycle
+[2026-11-20T00:32:30.640+0000][8.037s][info][gc     ] GC(40) Concurrent Undo Cycle 0.743ms
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc,heap] GC(41) Eden regions: 2->0(600)
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc,heap] GC(41) Survivor regions: 1->1(73)
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc,heap] GC(41) Old regions: 12->12
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc,heap] GC(41) Archive regions: 2->2
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc,heap] GC(41) Humongous regions: 558->534
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc     ] GC(41) Pause Young (Concurrent Start) (G1 Humongous Allocation) 571M->546M(1280M) 0.866ms
+[2026-11-20T00:32:30.647+0000][8.044s][info][gc     ] GC(42) Concurrent Undo Cycle
+[2026-11-20T00:32:30.649+0000][8.046s][info][gc     ] GC(42) Concurrent Undo Cycle 1.926ms
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc,heap] GC(43) Eden regions: 1->0(585)
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc,heap] GC(43) Survivor regions: 1->1(76)
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc,heap] GC(43) Old regions: 12->12
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc,heap] GC(43) Archive regions: 2->2
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc,heap] GC(43) Humongous regions: 558->550
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc     ] GC(43) Pause Young (Concurrent Start) (G1 Humongous Allocation) 571M->562M(1280M) 0.741ms
+[2026-11-20T00:32:30.654+0000][8.051s][info][gc     ] GC(44) Concurrent Undo Cycle
+[2026-11-20T00:32:30.661+0000][8.058s][info][gc     ] GC(44) Concurrent Undo Cycle 7.530ms
+[2026-11-20T00:32:30.666+0000][8.062s][info][gc,heap] GC(45) Eden regions: 2->0(587)
+[2026-11-20T00:32:30.666+0000][8.062s][info][gc,heap] GC(45) Survivor regions: 1->1(74)
+[2026-11-20T00:32:30.666+0000][8.062s][info][gc,heap] GC(45) Old regions: 12->12
+[2026-11-20T00:32:30.666+0000][8.062s][info][gc,heap] GC(45) Archive regions: 2->2
+[2026-11-20T00:32:30.666+0000][8.062s][info][gc,heap] GC(45) Humongous regions: 572->548
+[2026-11-20T00:32:30.666+0000][8.063s][info][gc     ] GC(45) Pause Young (Concurrent Start) (G1 Humongous Allocation) 585M->560M(1280M) 0.702ms
+[2026-11-20T00:32:30.666+0000][8.063s][info][gc     ] GC(46) Concurrent Undo Cycle
+[2026-11-20T00:32:30.666+0000][8.063s][info][gc     ] GC(46) Concurrent Undo Cycle 0.808ms
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc,heap] GC(47) Eden regions: 1->0(579)
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc,heap] GC(47) Survivor regions: 1->1(74)
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc,heap] GC(47) Old regions: 12->12
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc,heap] GC(47) Archive regions: 2->2
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc,heap] GC(47) Humongous regions: 564->556
+[2026-11-20T00:32:30.667+0000][8.064s][info][gc     ] GC(47) Pause Young (Concurrent Start) (G1 Humongous Allocation) 576M->568M(1280M) 0.754ms
+[2026-11-20T00:32:30.668+0000][8.064s][info][gc     ] GC(48) Concurrent Undo Cycle
+[2026-11-20T00:32:30.668+0000][8.065s][info][gc     ] GC(48) Concurrent Undo Cycle 0.757ms
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc,heap] GC(49) Eden regions: 2->0(589)
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc,heap] GC(49) Survivor regions: 1->1(73)
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc,heap] GC(49) Old regions: 12->12
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc,heap] GC(49) Archive regions: 2->2
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc,heap] GC(49) Humongous regions: 570->546
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc     ] GC(49) Pause Young (Concurrent Start) (G1 Humongous Allocation) 583M->558M(1280M) 0.730ms
+[2026-11-20T00:32:30.676+0000][8.073s][info][gc     ] GC(50) Concurrent Undo Cycle
+[2026-11-20T00:32:30.683+0000][8.080s][info][gc     ] GC(50) Concurrent Undo Cycle 6.938ms
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc,heap] GC(51) Eden regions: 2->0(583)
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc,heap] GC(51) Survivor regions: 1->1(74)
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc,heap] GC(51) Old regions: 12->12
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc,heap] GC(51) Archive regions: 2->2
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc,heap] GC(51) Humongous regions: 584->552
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc     ] GC(51) Pause Young (Concurrent Start) (G1 Humongous Allocation) 597M->564M(1280M) 0.943ms
+[2026-11-20T00:32:30.689+0000][8.086s][info][gc     ] GC(52) Concurrent Undo Cycle
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc     ] GC(52) Concurrent Undo Cycle 4.019ms
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc,heap] GC(53) Eden regions: 1->0(575)
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc,heap] GC(53) Survivor regions: 1->1(73)
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc,heap] GC(53) Old regions: 12->12
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc,heap] GC(53) Archive regions: 2->2
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc,heap] GC(53) Humongous regions: 568->560
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc     ] GC(53) Pause Young (Concurrent Start) (G1 Humongous Allocation) 581M->572M(1280M) 0.626ms
+[2026-11-20T00:32:30.693+0000][8.090s][info][gc     ] GC(54) Concurrent Undo Cycle
+[2026-11-20T00:32:30.694+0000][8.091s][info][gc     ] GC(54) Concurrent Undo Cycle 0.752ms
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc,heap] GC(55) Eden regions: 0->0(559)
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc,heap] GC(55) Survivor regions: 1->1(72)
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc,heap] GC(55) Old regions: 12->12
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc,heap] GC(55) Archive regions: 2->2
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc,heap] GC(55) Humongous regions: 576->576
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc     ] GC(55) Pause Young (Concurrent Start) (G1 Humongous Allocation) 588M->588M(1280M) 0.748ms
+[2026-11-20T00:32:30.695+0000][8.092s][info][gc     ] GC(56) Concurrent Mark Cycle
+[2026-11-20T00:32:30.715+0000][8.112s][info][gc     ] GC(56) Pause Remark 633M->633M(1280M) 2.484ms
+[2026-11-20T00:32:30.725+0000][8.122s][info][gc     ] GC(56) Pause Cleanup 666M->666M(1280M) 0.081ms
+[2026-11-20T00:32:30.750+0000][8.147s][info][gc     ] GC(56) Concurrent Mark Cycle 54.478ms
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc,heap] GC(57) Eden regions: 3->0(559)
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc,heap] GC(57) Survivor regions: 1->1(70)
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc,heap] GC(57) Old regions: 12->12
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc,heap] GC(57) Archive regions: 2->2
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc,heap] GC(57) Humongous regions: 696->576
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc     ] GC(57) Pause Young (Concurrent Start) (G1 Humongous Allocation) 711M->588M(1280M) 0.957ms
+[2026-11-20T00:32:30.756+0000][8.153s][info][gc     ] GC(58) Concurrent Mark Cycle
+[2026-11-20T00:32:30.776+0000][8.173s][info][gc     ] GC(58) Pause Remark 665M->665M(1280M) 2.459ms
+[2026-11-20T00:32:30.794+0000][8.191s][info][gc     ] GC(58) Pause Cleanup 704M->704M(1280M) 0.075ms
+[2026-11-20T00:32:30.795+0000][8.192s][info][gc     ] GC(58) Concurrent Mark Cycle 38.679ms
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc,heap] GC(59) Eden regions: 3->0(541)
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc,heap] GC(59) Survivor regions: 1->1(70)
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc,heap] GC(59) Old regions: 12->12
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc,heap] GC(59) Archive regions: 2->2
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc,heap] GC(59) Humongous regions: 690->594
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc     ] GC(59) Pause Young (Concurrent Start) (G1 Humongous Allocation) 705M->606M(1280M) 0.826ms
+[2026-11-20T00:32:30.796+0000][8.193s][info][gc     ] GC(60) Concurrent Mark Cycle
+[2026-11-20T00:32:30.811+0000][8.208s][info][gc     ] GC(60) Pause Remark 653M->653M(1280M) 2.389ms
+[2026-11-20T00:32:30.817+0000][8.214s][info][gc     ] GC(60) Pause Cleanup 683M->683M(1280M) 0.084ms
+[2026-11-20T00:32:30.818+0000][8.215s][info][gc     ] GC(60) Concurrent Mark Cycle 22.332ms
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc,heap] GC(61) Eden regions: 2->0(529)
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc,heap] GC(61) Survivor regions: 1->1(68)
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc,heap] GC(61) Old regions: 12->12
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc,heap] GC(61) Archive regions: 2->2
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc,heap] GC(61) Humongous regions: 670->606
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc     ] GC(61) Pause Young (Concurrent Start) (G1 Humongous Allocation) 684M->618M(1280M) 0.839ms
+[2026-11-20T00:32:30.822+0000][8.219s][info][gc     ] GC(62) Concurrent Mark Cycle
+[2026-11-20T00:32:30.849+0000][8.246s][info][gc     ] GC(62) Pause Remark 704M->704M(1280M) 2.401ms
+[2026-11-20T00:32:30.855+0000][8.252s][info][gc     ] GC(62) Pause Cleanup 734M->734M(1280M) 0.067ms
+[2026-11-20T00:32:30.856+0000][8.253s][info][gc     ] GC(62) Concurrent Mark Cycle 33.878ms
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc,heap] GC(63) Eden regions: 3->0(511)
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc,heap] GC(63) Survivor regions: 1->1(67)
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc,heap] GC(63) Old regions: 12->12
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc,heap] GC(63) Archive regions: 2->2
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc,heap] GC(63) Humongous regions: 720->624
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc     ] GC(63) Pause Young (Concurrent Start) (G1 Humongous Allocation) 735M->636M(1280M) 0.903ms
+[2026-11-20T00:32:30.863+0000][8.260s][info][gc     ] GC(64) Concurrent Mark Cycle
+[2026-11-20T00:32:30.880+0000][8.277s][info][gc     ] GC(64) Pause Remark 691M->691M(1280M) 2.373ms
+[2026-11-20T00:32:30.886+0000][8.283s][info][gc     ] GC(64) Pause Cleanup 713M->713M(1280M) 0.081ms
+[2026-11-20T00:32:30.887+0000][8.284s][info][gc     ] GC(64) Concurrent Mark Cycle 24.085ms
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc,heap] GC(65) Eden regions: 2->0(499)
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc,heap] GC(65) Survivor regions: 1->1(64)
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc,heap] GC(65) Old regions: 12->12
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc,heap] GC(65) Archive regions: 2->2
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc,heap] GC(65) Humongous regions: 700->636
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc     ] GC(65) Pause Young (Concurrent Start) (G1 Humongous Allocation) 714M->648M(1280M) 0.804ms
+[2026-11-20T00:32:30.889+0000][8.286s][info][gc     ] GC(66) Concurrent Mark Cycle
+[2026-11-20T00:32:30.917+0000][8.314s][info][gc     ] GC(66) Pause Remark 725M->725M(1280M) 2.551ms
+[2026-11-20T00:32:30.924+0000][8.321s][info][gc     ] GC(66) Pause Cleanup 734M->734M(1280M) 0.076ms
+[2026-11-20T00:32:30.925+0000][8.322s][info][gc     ] GC(66) Concurrent Mark Cycle 36.083ms
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc,heap] GC(67) Eden regions: 3->0(479)
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc,heap] GC(67) Survivor regions: 1->1(63)
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc,heap] GC(67) Old regions: 12->12
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc,heap] GC(67) Archive regions: 2->2
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc,heap] GC(67) Humongous regions: 720->656
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc     ] GC(67) Pause Young (Concurrent Start) (G1 Humongous Allocation) 734M->668M(1280M) 0.864ms
+[2026-11-20T00:32:30.929+0000][8.326s][info][gc     ] GC(68) Concurrent Mark Cycle
+[2026-11-20T00:32:30.946+0000][8.343s][info][gc     ] GC(68) Pause Remark 738M->738M(1280M) 2.540ms
+[2026-11-20T00:32:30.953+0000][8.350s][info][gc     ] GC(68) Pause Cleanup 746M->746M(1280M) 0.076ms
+[2026-11-20T00:32:30.954+0000][8.351s][info][gc     ] GC(68) Concurrent Mark Cycle 25.503ms
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc,heap] GC(69) Eden regions: 3->0(467)
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc,heap] GC(69) Survivor regions: 1->1(60)
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc,heap] GC(69) Old regions: 12->12
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc,heap] GC(69) Archive regions: 2->2
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc,heap] GC(69) Humongous regions: 732->668
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc     ] GC(69) Pause Young (Concurrent Start) (G1 Humongous Allocation) 746M->680M(1280M) 0.864ms
+[2026-11-20T00:32:30.958+0000][8.355s][info][gc     ] GC(70) Concurrent Mark Cycle
+[2026-11-20T00:32:30.975+0000][8.372s][info][gc     ] GC(70) Pause Remark 749M->749M(1280M) 2.685ms
+[2026-11-20T00:32:30.981+0000][8.378s][info][gc     ] GC(70) Pause Cleanup 758M->758M(1280M) 0.074ms
+[2026-11-20T00:32:30.982+0000][8.379s][info][gc     ] GC(70) Concurrent Mark Cycle 24.416ms
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc,heap] GC(71) Eden regions: 3->0(455)
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc,heap] GC(71) Survivor regions: 1->1(59)
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc,heap] GC(71) Old regions: 12->12
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc,heap] GC(71) Archive regions: 2->2
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc,heap] GC(71) Humongous regions: 744->680
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc     ] GC(71) Pause Young (Concurrent Start) (G1 Humongous Allocation) 759M->692M(1280M) 1.007ms
+[2026-11-20T00:32:30.989+0000][8.386s][info][gc     ] GC(72) Concurrent Mark Cycle
+[2026-11-20T00:32:31.007+0000][8.404s][info][gc     ] GC(72) Pause Remark 761M->761M(1280M) 2.515ms
+[2026-11-20T00:32:31.013+0000][8.410s][info][gc     ] GC(72) Pause Cleanup 770M->770M(1280M) 0.076ms
+[2026-11-20T00:32:31.014+0000][8.410s][info][gc     ] GC(72) Concurrent Mark Cycle 24.510ms
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc,heap] GC(73) Eden regions: 2->0(443)
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc,heap] GC(73) Survivor regions: 1->1(57)
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc,heap] GC(73) Old regions: 12->12
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc,heap] GC(73) Archive regions: 2->2
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc,heap] GC(73) Humongous regions: 756->692
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc     ] GC(73) Pause Young (Concurrent Start) (G1 Humongous Allocation) 770M->704M(1280M) 0.873ms
+[2026-11-20T00:32:31.016+0000][8.413s][info][gc     ] GC(74) Concurrent Mark Cycle
+[2026-11-20T00:32:31.043+0000][8.440s][info][gc     ] GC(74) Pause Remark 774M->774M(1280M) 2.421ms
+[2026-11-20T00:32:31.050+0000][8.447s][info][gc     ] GC(74) Pause Cleanup 790M->790M(1280M) 0.067ms
+[2026-11-20T00:32:31.051+0000][8.448s][info][gc     ] GC(74) Concurrent Mark Cycle 34.575ms
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc,heap] GC(75) Eden regions: 3->0(423)
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc,heap] GC(75) Survivor regions: 1->1(56)
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc,heap] GC(75) Old regions: 12->12
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc,heap] GC(75) Archive regions: 2->2
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc,heap] GC(75) Humongous regions: 784->712
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc     ] GC(75) Pause Young (Concurrent Start) (G1 Humongous Allocation) 798M->724M(1280M) 0.848ms
+[2026-11-20T00:32:31.052+0000][8.449s][info][gc     ] GC(76) Concurrent Mark Cycle
+[2026-11-20T00:32:31.069+0000][8.466s][info][gc     ] GC(76) Pause Remark 778M->778M(1280M) 2.869ms
+[2026-11-20T00:32:31.075+0000][8.472s][info][gc     ] GC(76) Pause Cleanup 778M->778M(1280M) 0.066ms
+[2026-11-20T00:32:31.076+0000][8.473s][info][gc     ] GC(76) Concurrent Mark Cycle 23.714ms
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc,heap] GC(77) Eden regions: 3->0(427)
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc,heap] GC(77) Survivor regions: 1->1(53)
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc,heap] GC(77) Old regions: 12->12
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc,heap] GC(77) Archive regions: 2->2
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc,heap] GC(77) Humongous regions: 764->708
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc     ] GC(77) Pause Young (Concurrent Start) (G1 Humongous Allocation) 778M->720M(1280M) 1.291ms
+[2026-11-20T00:32:31.078+0000][8.474s][info][gc     ] GC(78) Concurrent Mark Cycle
+[2026-11-20T00:32:31.095+0000][8.492s][info][gc     ] GC(78) Pause Remark 775M->775M(1280M) 2.429ms
+[2026-11-20T00:32:31.101+0000][8.498s][info][gc     ] GC(78) Pause Cleanup 797M->797M(1280M) 0.086ms
+[2026-11-20T00:32:31.102+0000][8.499s][info][gc     ] GC(78) Concurrent Mark Cycle 24.305ms
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc,heap] GC(79) Eden regions: 2->0(415)
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc,heap] GC(79) Survivor regions: 1->1(54)
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc,heap] GC(79) Old regions: 12->12
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc,heap] GC(79) Archive regions: 2->2
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc,heap] GC(79) Humongous regions: 784->720
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc     ] GC(79) Pause Young (Concurrent Start) (G1 Humongous Allocation) 798M->732M(1280M) 0.852ms
+[2026-11-20T00:32:31.105+0000][8.501s][info][gc     ] GC(80) Concurrent Mark Cycle
+[2026-11-20T00:32:31.121+0000][8.518s][info][gc     ] GC(80) Pause Remark 779M->779M(1280M) 2.428ms
+[2026-11-20T00:32:31.127+0000][8.524s][info][gc     ] GC(80) Pause Cleanup 809M->809M(1280M) 0.080ms
+[2026-11-20T00:32:31.128+0000][8.525s][info][gc     ] GC(80) Concurrent Mark Cycle 23.385ms
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc,heap] GC(81) Eden regions: 3->0(403)
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc,heap] GC(81) Survivor regions: 1->1(52)
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc,heap] GC(81) Old regions: 12->12
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc,heap] GC(81) Archive regions: 2->2
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc,heap] GC(81) Humongous regions: 796->732
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc     ] GC(81) Pause Young (Concurrent Start) (G1 Humongous Allocation) 810M->744M(1280M) 0.892ms
+[2026-11-20T00:32:31.132+0000][8.529s][info][gc     ] GC(82) Concurrent Mark Cycle
+[2026-11-20T00:32:31.149+0000][8.546s][info][gc     ] GC(82) Pause Remark 799M->799M(1280M) 2.337ms
+[2026-11-20T00:32:31.155+0000][8.552s][info][gc     ] GC(82) Pause Cleanup 821M->821M(1280M) 0.071ms
+[2026-11-20T00:32:31.156+0000][8.553s][info][gc     ] GC(82) Concurrent Mark Cycle 23.726ms
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc,heap] GC(83) Eden regions: 3->0(391)
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc,heap] GC(83) Survivor regions: 1->1(51)
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc,heap] GC(83) Old regions: 12->12
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc,heap] GC(83) Archive regions: 2->2
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc,heap] GC(83) Humongous regions: 808->744
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc     ] GC(83) Pause Young (Concurrent Start) (G1 Humongous Allocation) 822M->756M(1280M) 0.866ms
+[2026-11-20T00:32:31.160+0000][8.557s][info][gc     ] GC(84) Concurrent Mark Cycle
+[2026-11-20T00:32:31.176+0000][8.573s][info][gc     ] GC(84) Pause Remark 803M->803M(1280M) 2.775ms
+[2026-11-20T00:32:31.182+0000][8.579s][info][gc     ] GC(84) Pause Cleanup 833M->833M(1280M) 0.096ms
+[2026-11-20T00:32:31.183+0000][8.580s][info][gc     ] GC(84) Concurrent Mark Cycle 22.679ms
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc,heap] GC(85) Eden regions: 3->0(380)
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc,heap] GC(85) Survivor regions: 1->1(49)
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc,heap] GC(85) Old regions: 12->12
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc,heap] GC(85) Archive regions: 2->2
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc,heap] GC(85) Humongous regions: 820->756
+[2026-11-20T00:32:31.187+0000][8.584s][info][gc     ] GC(85) Pause Young (Concurrent Start) (G1 Humongous Allocation) 834M->768M(1280M) 0.855ms
+[2026-11-20T00:32:31.188+0000][8.584s][info][gc     ] GC(86) Concurrent Mark Cycle
+[2026-11-20T00:32:31.204+0000][8.601s][info][gc     ] GC(86) Pause Remark 816M->816M(1280M) 2.597ms
+[2026-11-20T00:32:31.210+0000][8.607s][info][gc     ] GC(86) Pause Cleanup 846M->846M(1280M) 0.108ms
+[2026-11-20T00:32:31.211+0000][8.608s][info][gc     ] GC(86) Concurrent Mark Cycle 23.560ms
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc,heap] GC(87) Eden regions: 3->0(367)
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc,heap] GC(87) Survivor regions: 1->1(48)
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc,heap] GC(87) Old regions: 12->12
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc,heap] GC(87) Archive regions: 2->2
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc,heap] GC(87) Humongous regions: 832->768
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc     ] GC(87) Pause Young (Concurrent Start) (G1 Humongous Allocation) 846M->780M(1280M) 0.970ms
+[2026-11-20T00:32:31.218+0000][8.615s][info][gc     ] GC(88) Concurrent Mark Cycle
+[2026-11-20T00:32:31.237+0000][8.633s][info][gc     ] GC(88) Pause Remark 844M->844M(1280M) 2.786ms
+[2026-11-20T00:32:31.243+0000][8.639s][info][gc     ] GC(88) Pause Cleanup 858M->858M(1280M) 0.078ms
+[2026-11-20T00:32:31.243+0000][8.640s][info][gc     ] GC(88) Concurrent Mark Cycle 25.456ms
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc,heap] GC(89) Eden regions: 2->0(355)
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc,heap] GC(89) Survivor regions: 1->1(46)
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc,heap] GC(89) Old regions: 12->12
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc,heap] GC(89) Archive regions: 2->2
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc,heap] GC(89) Humongous regions: 844->780
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc     ] GC(89) Pause Young (Concurrent Start) (G1 Humongous Allocation) 858M->792M(1280M) 0.882ms
+[2026-11-20T00:32:31.246+0000][8.643s][info][gc     ] GC(90) Concurrent Mark Cycle
+[2026-11-20T00:32:31.264+0000][8.661s][info][gc     ] GC(90) Pause Remark 847M->847M(1280M) 3.156ms
+[2026-11-20T00:32:31.270+0000][8.667s][info][gc     ] GC(90) Pause Cleanup 869M->869M(1280M) 0.086ms
+[2026-11-20T00:32:31.271+0000][8.668s][info][gc     ] GC(90) Concurrent Mark Cycle 25.114ms
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc,heap] GC(91) Eden regions: 2->0(343)
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc,heap] GC(91) Survivor regions: 1->1(45)
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc,heap] GC(91) Old regions: 12->12
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc,heap] GC(91) Archive regions: 2->2
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc,heap] GC(91) Humongous regions: 856->792
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc     ] GC(91) Pause Young (Concurrent Start) (G1 Humongous Allocation) 870M->804M(1280M) 0.962ms
+[2026-11-20T00:32:31.274+0000][8.671s][info][gc     ] GC(92) Concurrent Mark Cycle
+[2026-11-20T00:32:31.291+0000][8.688s][info][gc     ] GC(92) Pause Remark 860M->860M(1280M) 2.465ms
+[2026-11-20T00:32:31.297+0000][8.694s][info][gc     ] GC(92) Pause Cleanup 882M->882M(1280M) 0.083ms
+[2026-11-20T00:32:31.298+0000][8.695s][info][gc     ] GC(92) Concurrent Mark Cycle 24.097ms
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc,heap] GC(93) Eden regions: 3->0(331)
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc,heap] GC(93) Survivor regions: 1->1(43)
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc,heap] GC(93) Old regions: 12->12
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc,heap] GC(93) Archive regions: 2->2
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc,heap] GC(93) Humongous regions: 868->804
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc     ] GC(93) Pause Young (Concurrent Start) (G1 Humongous Allocation) 882M->816M(1280M) 0.845ms
+[2026-11-20T00:32:31.301+0000][8.698s][info][gc     ] GC(94) Concurrent Mark Cycle
+[2026-11-20T00:32:31.317+0000][8.714s][info][gc     ] GC(94) Pause Remark 863M->863M(1280M) 2.497ms
+[2026-11-20T00:32:31.323+0000][8.720s][info][gc     ] GC(94) Pause Cleanup 893M->893M(1280M) 0.071ms
+[2026-11-20T00:32:31.324+0000][8.721s][info][gc     ] GC(94) Concurrent Mark Cycle 22.528ms
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc,heap] GC(95) Eden regions: 3->0(320)
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc,heap] GC(95) Survivor regions: 1->1(42)
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc,heap] GC(95) Old regions: 12->12
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc,heap] GC(95) Archive regions: 2->2
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc,heap] GC(95) Humongous regions: 880->816
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc     ] GC(95) Pause Young (Concurrent Start) (G1 Humongous Allocation) 894M->828M(1280M) 0.917ms
+[2026-11-20T00:32:31.328+0000][8.725s][info][gc     ] GC(96) Concurrent Mark Cycle
+[2026-11-20T00:32:31.345+0000][8.742s][info][gc     ] GC(96) Pause Remark 876M->876M(1280M) 2.450ms
+[2026-11-20T00:32:31.351+0000][8.748s][info][gc     ] GC(96) Pause Cleanup 906M->906M(1280M) 0.076ms
+[2026-11-20T00:32:31.352+0000][8.748s][info][gc     ] GC(96) Concurrent Mark Cycle 23.550ms
+[2026-11-20T00:32:31.358+0000][8.755s][info][gc,heap] GC(97) Eden regions: 3->0(307)
+[2026-11-20T00:32:31.358+0000][8.755s][info][gc,heap] GC(97) Survivor regions: 1->1(41)
+[2026-11-20T00:32:31.358+0000][8.755s][info][gc,heap] GC(97) Old regions: 12->12
+[2026-11-20T00:32:31.359+0000][8.755s][info][gc,heap] GC(97) Archive regions: 2->2
+[2026-11-20T00:32:31.359+0000][8.755s][info][gc,heap] GC(97) Humongous regions: 892->828
+[2026-11-20T00:32:31.359+0000][8.755s][info][gc     ] GC(97) Pause Young (Concurrent Start) (G1 Humongous Allocation) 906M->840M(1280M) 0.937ms
+[2026-11-20T00:32:31.359+0000][8.755s][info][gc     ] GC(98) Concurrent Mark Cycle
+[2026-11-20T00:32:31.376+0000][8.773s][info][gc     ] GC(98) Pause Remark 896M->896M(1280M) 2.590ms
+[2026-11-20T00:32:31.383+0000][8.780s][info][gc     ] GC(98) Pause Cleanup 918M->918M(1280M) 0.081ms
+[2026-11-20T00:32:31.384+0000][8.781s][info][gc     ] GC(98) Concurrent Mark Cycle 25.269ms
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc,heap] GC(99) Eden regions: 2->0(295)
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc,heap] GC(99) Survivor regions: 1->1(39)
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc,heap] GC(99) Old regions: 12->12
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc,heap] GC(99) Archive regions: 2->2
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc,heap] GC(99) Humongous regions: 904->840
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc     ] GC(99) Pause Young (Concurrent Start) (G1 Humongous Allocation) 918M->852M(1280M) 0.930ms
+[2026-11-20T00:32:31.387+0000][8.784s][info][gc     ] GC(100) Concurrent Mark Cycle
+[2026-11-20T00:32:31.403+0000][8.800s][info][gc     ] GC(100) Pause Remark 890M->890M(1280M) 2.428ms
+[2026-11-20T00:32:31.411+0000][8.808s][info][gc     ] GC(100) Pause Cleanup 899M->899M(1280M) 0.095ms
+[2026-11-20T00:32:31.413+0000][8.810s][info][gc     ] GC(100) Concurrent Mark Cycle 26.352ms
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc,heap] GC(101) Eden regions: 2->0(265)
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc,heap] GC(101) Survivor regions: 1->1(37)
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc,heap] GC(101) Old regions: 12->12
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc,heap] GC(101) Archive regions: 2->2
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc,heap] GC(101) Humongous regions: 910->870
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc     ] GC(101) Pause Young (Concurrent Start) (G1 Humongous Allocation) 923M->882M(1280M) 0.933ms
+[2026-11-20T00:32:31.415+0000][8.812s][info][gc     ] GC(102) Concurrent Mark Cycle
+[2026-11-20T00:32:31.431+0000][8.827s][info][gc     ] GC(102) Pause Remark 892M->892M(1280M) 2.240ms
+[2026-11-20T00:32:31.437+0000][8.833s][info][gc     ] GC(102) Pause Cleanup 894M->894M(1280M) 0.082ms
+[2026-11-20T00:32:31.437+0000][8.834s][info][gc     ] GC(102) Concurrent Mark Cycle 22.375ms
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc,heap] GC(103) Eden regions: 265->0(284)
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc,heap] GC(103) Survivor regions: 1->1(34)
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc,heap] GC(103) Old regions: 12->12
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc,heap] GC(103) Archive regions: 2->2
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc,heap] GC(103) Humongous regions: 876->852
+[2026-11-20T00:32:34.310+0000][11.707s][info][gc     ] GC(103) Pause Young (Normal) (G1 Evacuation Pause) 1153M->864M(1280M) 1.659ms
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc,heap] GC(104) Eden regions: 284->0(284)
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc,heap] GC(104) Survivor regions: 1->1(36)
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc,heap] GC(104) Old regions: 12->12
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc,heap] GC(104) Archive regions: 2->2
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc,heap] GC(104) Humongous regions: 852->852
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc     ] GC(104) Pause Young (Concurrent Start) (G1 Evacuation Pause) 1148M->864M(1280M) 1.651ms
+[2026-11-20T00:32:36.744+0000][14.141s][info][gc     ] GC(105) Concurrent Mark Cycle
+[2026-11-20T00:32:36.761+0000][14.158s][info][gc     ] GC(105) Pause Remark 870M->870M(1280M) 2.912ms
+[2026-11-20T00:32:36.767+0000][14.164s][info][gc     ] GC(105) Pause Cleanup 870M->870M(1280M) 0.105ms
+[2026-11-20T00:32:36.768+0000][14.165s][info][gc     ] GC(105) Concurrent Mark Cycle 23.855ms
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc,heap] GC(106) Eden regions: 284->0(284)
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc,heap] GC(106) Survivor regions: 1->1(36)
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc,heap] GC(106) Old regions: 12->12
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc,heap] GC(106) Archive regions: 2->2
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc,heap] GC(106) Humongous regions: 852->852
+[2026-11-20T00:32:38.945+0000][16.342s][info][gc     ] GC(106) Pause Young (Normal) (G1 Evacuation Pause) 1148M->864M(1280M) 1.806ms
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc,heap] GC(107) Eden regions: 284->0(284)
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc,heap] GC(107) Survivor regions: 1->1(36)
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc,heap] GC(107) Old regions: 12->12
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc,heap] GC(107) Archive regions: 2->2
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc,heap] GC(107) Humongous regions: 852->852
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc     ] GC(107) Pause Young (Concurrent Start) (G1 Evacuation Pause) 1148M->864M(1280M) 1.374ms
+[2026-11-20T00:32:40.899+0000][18.296s][info][gc     ] GC(108) Concurrent Mark Cycle
+[2026-11-20T00:32:40.916+0000][18.313s][info][gc     ] GC(108) Pause Remark 869M->869M(1280M) 2.994ms
+[2026-11-20T00:32:40.922+0000][18.319s][info][gc     ] GC(108) Pause Cleanup 869M->869M(1280M) 0.059ms
+[2026-11-20T00:32:40.923+0000][18.320s][info][gc     ] GC(108) Concurrent Mark Cycle 23.693ms
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc,heap] GC(109) Eden regions: 284->0(284)
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc,heap] GC(109) Survivor regions: 1->1(36)
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc,heap] GC(109) Old regions: 12->12
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc,heap] GC(109) Archive regions: 2->2
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc,heap] GC(109) Humongous regions: 852->852
+[2026-11-20T00:32:42.834+0000][20.230s][info][gc     ] GC(109) Pause Young (Normal) (G1 Evacuation Pause) 1148M->864M(1280M) 1.248ms
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc,heap] GC(110) Eden regions: 284->0(284)
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc,heap] GC(110) Survivor regions: 1->1(36)
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc,heap] GC(110) Old regions: 12->12
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc,heap] GC(110) Archive regions: 2->2
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc,heap] GC(110) Humongous regions: 852->852
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc     ] GC(110) Pause Young (Concurrent Start) (G1 Evacuation Pause) 1148M->864M(1280M) 1.673ms
+[2026-11-20T00:32:44.748+0000][22.145s][info][gc     ] GC(111) Concurrent Mark Cycle
+[2026-11-20T00:32:44.765+0000][22.162s][info][gc     ] GC(111) Pause Remark 868M->868M(1280M) 3.640ms
+[2026-11-20T00:32:44.771+0000][22.168s][info][gc     ] GC(111) Pause Cleanup 869M->869M(1280M) 0.080ms
+[2026-11-20T00:32:44.772+0000][22.169s][info][gc     ] GC(111) Concurrent Mark Cycle 23.741ms
+[2026-11-20T00:32:59.972+0000][37.368s][info][gc,heap] GC(112) Eden regions: 13->0(284)
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc,heap] GC(112) Survivor regions: 1->1(36)
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc,heap] GC(112) Old regions: 12->12
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc,heap] GC(112) Archive regions: 2->2
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc,heap] GC(112) Humongous regions: 852->852
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc     ] GC(112) Pause Young (Concurrent Start) (G1 Humongous Allocation) 877M->864M(1280M) 1.695ms
+[2026-11-20T00:32:59.972+0000][37.369s][info][gc     ] GC(113) Concurrent Mark Cycle
+[2026-11-20T00:32:59.990+0000][37.387s][info][gc     ] GC(113) Pause Remark 902M->896M(1280M) 3.630ms
+[2026-11-20T00:33:00.000+0000][37.397s][info][gc     ] GC(113) Pause Cleanup 897M->897M(1280M) 0.081ms
+[2026-11-20T00:33:00.001+0000][37.398s][info][gc     ] GC(113) Concurrent Mark Cycle 29.092ms
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc,heap] GC(114) Eden regions: 8->0(282)
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc,heap] GC(114) Survivor regions: 1->1(36)
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc,heap] GC(114) Old regions: 12->12
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc,heap] GC(114) Archive regions: 2->2
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc,heap] GC(114) Humongous regions: 884->846
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc     ] GC(114) Pause Young (Concurrent Start) (G1 Humongous Allocation) 903M->858M(1280M) 2.631ms
+[2026-11-20T00:33:15.248+0000][52.645s][info][gc     ] GC(115) Concurrent Mark Cycle
+[2026-11-20T00:33:15.271+0000][52.668s][info][gc     ] GC(115) Pause Remark 897M->891M(1280M) 4.782ms
+[2026-11-20T00:33:15.277+0000][52.674s][info][gc     ] GC(115) Pause Cleanup 891M->891M(1280M) 0.125ms
+[2026-11-20T00:33:15.279+0000][52.675s][info][gc     ] GC(115) Concurrent Mark Cycle 30.373ms
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc,heap] GC(116) Eden regions: 3->0(286)
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc,heap] GC(116) Survivor regions: 1->1(36)
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc,heap] GC(116) Old regions: 12->12
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc,heap] GC(116) Archive regions: 2->2
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc,heap] GC(116) Humongous regions: 878->840
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc     ] GC(116) Pause Young (Concurrent Start) (G1 Humongous Allocation) 893M->852M(1280M) 1.717ms
+[2026-11-20T00:33:30.454+0000][67.851s][info][gc     ] GC(117) Concurrent Mark Cycle
+[2026-11-20T00:33:30.471+0000][67.868s][info][gc     ] GC(117) Pause Remark 891M->885M(1280M) 3.743ms
+[2026-11-20T00:33:30.478+0000][67.874s][info][gc     ] GC(117) Pause Cleanup 885M->885M(1280M) 0.077ms
+[2026-11-20T00:33:30.478+0000][67.875s][info][gc     ] GC(117) Concurrent Mark Cycle 24.619ms
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc,heap] GC(118) Eden regions: 3->0(291)
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc,heap] GC(118) Survivor regions: 1->1(36)
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc,heap] GC(118) Old regions: 12->12
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc,heap] GC(118) Archive regions: 2->2
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc,heap] GC(118) Humongous regions: 872->834
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc     ] GC(118) Pause Young (Concurrent Start) (G1 Humongous Allocation) 887M->846M(1280M) 2.686ms
+[2026-11-20T00:33:45.659+0000][83.056s][info][gc     ] GC(119) Concurrent Mark Cycle
+[2026-11-20T00:33:45.678+0000][83.075s][info][gc     ] GC(119) Pause Remark 885M->879M(1280M) 4.864ms
+[2026-11-20T00:33:45.685+0000][83.081s][info][gc     ] GC(119) Pause Cleanup 880M->880M(1280M) 0.096ms
+[2026-11-20T00:33:45.685+0000][83.082s][info][gc     ] GC(119) Concurrent Mark Cycle 26.565ms
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc,heap] GC(120) Eden regions: 3->0(296)
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc,heap] GC(120) Survivor regions: 1->1(37)
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc,heap] GC(120) Old regions: 12->12
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc,heap] GC(120) Archive regions: 2->2
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc,heap] GC(120) Humongous regions: 866->828
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc     ] GC(120) Pause Young (Concurrent Start) (G1 Humongous Allocation) 881M->840M(1280M) 1.768ms
+[2026-11-20T00:34:00.870+0000][98.267s][info][gc     ] GC(121) Concurrent Mark Cycle
+[2026-11-20T00:34:00.887+0000][98.284s][info][gc     ] GC(121) Pause Remark 879M->873M(1280M) 3.503ms
+[2026-11-20T00:34:00.894+0000][98.290s][info][gc     ] GC(121) Pause Cleanup 874M->874M(1280M) 0.074ms
+[2026-11-20T00:34:00.894+0000][98.291s][info][gc     ] GC(121) Concurrent Mark Cycle 24.573ms
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc,heap] GC(122) Eden regions: 4->0(302)
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc,heap] GC(122) Survivor regions: 1->1(38)
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc,heap] GC(122) Old regions: 12->12
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc,heap] GC(122) Archive regions: 2->2
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc,heap] GC(122) Humongous regions: 860->822
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc     ] GC(122) Pause Young (Concurrent Start) (G1 Humongous Allocation) 876M->834M(1280M) 1.650ms
+[2026-11-20T00:34:16.072+0000][113.469s][info][gc     ] GC(123) Concurrent Mark Cycle
+[2026-11-20T00:34:16.089+0000][113.486s][info][gc     ] GC(123) Pause Remark 873M->867M(1280M) 3.346ms
+[2026-11-20T00:34:16.096+0000][113.492s][info][gc     ] GC(123) Pause Cleanup 867M->867M(1280M) 0.099ms
+[2026-11-20T00:34:16.096+0000][113.493s][info][gc     ] GC(123) Concurrent Mark Cycle 24.187ms
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc,heap] GC(124) Eden regions: 3->0(310)
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc,heap] GC(124) Survivor regions: 1->1(38)
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc,heap] GC(124) Old regions: 12->12
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc,heap] GC(124) Archive regions: 2->2
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc,heap] GC(124) Humongous regions: 854->816
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc     ] GC(124) Pause Young (Concurrent Start) (G1 Humongous Allocation) 869M->828M(1280M) 1.867ms
+[2026-11-20T00:34:31.270+0000][128.667s][info][gc     ] GC(125) Concurrent Mark Cycle
+[2026-11-20T00:34:31.289+0000][128.686s][info][gc     ] GC(125) Pause Remark 867M->861M(1280M) 3.362ms
+[2026-11-20T00:34:31.295+0000][128.692s][info][gc     ] GC(125) Pause Cleanup 862M->862M(1280M) 0.071ms
+[2026-11-20T00:34:31.296+0000][128.693s][info][gc     ] GC(125) Concurrent Mark Cycle 26.148ms
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc,heap] GC(126) Eden regions: 3->0(317)
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc,heap] GC(126) Survivor regions: 1->1(39)
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc,heap] GC(126) Old regions: 12->12
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc,heap] GC(126) Archive regions: 2->2
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc,heap] GC(126) Humongous regions: 848->810
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc     ] GC(126) Pause Young (Concurrent Start) (G1 Humongous Allocation) 863M->822M(1280M) 2.268ms
+[2026-11-20T00:34:46.479+0000][143.876s][info][gc     ] GC(127) Concurrent Mark Cycle
+[2026-11-20T00:34:46.510+0000][143.907s][info][gc     ] GC(127) Pause Remark 862M->856M(1280M) 3.837ms
+[2026-11-20T00:34:46.516+0000][143.913s][info][gc     ] GC(127) Pause Cleanup 856M->856M(1280M) 0.093ms
+[2026-11-20T00:34:46.516+0000][143.913s][info][gc     ] GC(127) Concurrent Mark Cycle 37.008ms
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc,heap] GC(128) Eden regions: 3->0(325)
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc,heap] GC(128) Survivor regions: 1->1(40)
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc,heap] GC(128) Old regions: 12->12
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc,heap] GC(128) Archive regions: 2->2
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc,heap] GC(128) Humongous regions: 842->804
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc     ] GC(128) Pause Young (Concurrent Start) (G1 Humongous Allocation) 857M->816M(1280M) 1.765ms
+[2026-11-20T00:34:46.651+0000][144.048s][info][gc     ] GC(129) Concurrent Mark Cycle
+[2026-11-20T00:34:46.668+0000][144.065s][info][gc     ] GC(129) Pause Remark 855M->849M(1280M) 3.402ms
+[2026-11-20T00:34:46.674+0000][144.071s][info][gc     ] GC(129) Pause Cleanup 849M->849M(1280M) 0.062ms
+[2026-11-20T00:34:46.675+0000][144.072s][info][gc     ] GC(129) Concurrent Mark Cycle 23.574ms
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc,heap] GC(130) Eden regions: 3->0(332)
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc,heap] GC(130) Survivor regions: 1->1(41)
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc,heap] GC(130) Old regions: 12->12
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc,heap] GC(130) Archive regions: 2->2
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc,heap] GC(130) Humongous regions: 836->798
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc     ] GC(130) Pause Young (Concurrent Start) (G1 Humongous Allocation) 851M->810M(1280M) 1.894ms
+[2026-11-20T00:35:01.858+0000][159.255s][info][gc     ] GC(131) Concurrent Mark Cycle
+[2026-11-20T00:35:01.876+0000][159.273s][info][gc     ] GC(131) Pause Remark 849M->843M(1280M) 3.500ms
+[2026-11-20T00:35:01.882+0000][159.279s][info][gc     ] GC(131) Pause Cleanup 843M->843M(1280M) 0.068ms
+[2026-11-20T00:35:01.883+0000][159.280s][info][gc     ] GC(131) Concurrent Mark Cycle 25.239ms
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc,heap] GC(132) Eden regions: 4->0(339)
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc,heap] GC(132) Survivor regions: 1->1(42)
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc,heap] GC(132) Old regions: 12->12
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc,heap] GC(132) Archive regions: 2->2
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc,heap] GC(132) Humongous regions: 830->792
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc     ] GC(132) Pause Young (Concurrent Start) (G1 Humongous Allocation) 846M->804M(1280M) 4.895ms
+[2026-11-20T00:35:17.068+0000][174.465s][info][gc     ] GC(133) Concurrent Mark Cycle
+[2026-11-20T00:35:17.094+0000][174.491s][info][gc     ] GC(133) Pause Remark 843M->837M(1280M) 11.643ms
+[2026-11-20T00:35:17.101+0000][174.498s][info][gc     ] GC(133) Pause Cleanup 838M->838M(1280M) 0.105ms
+[2026-11-20T00:35:17.102+0000][174.499s][info][gc     ] GC(133) Concurrent Mark Cycle 33.431ms
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc,heap] GC(134) Eden regions: 4->0(346)
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc,heap] GC(134) Survivor regions: 1->1(43)
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc,heap] GC(134) Old regions: 12->12
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc,heap] GC(134) Archive regions: 2->2
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc,heap] GC(134) Humongous regions: 824->786
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc     ] GC(134) Pause Young (Concurrent Start) (G1 Humongous Allocation) 840M->798M(1280M) 1.229ms
+[2026-11-20T00:35:32.271+0000][189.668s][info][gc     ] GC(135) Concurrent Mark Cycle
+[2026-11-20T00:35:32.289+0000][189.686s][info][gc     ] GC(135) Pause Remark 837M->831M(1280M) 2.534ms
+[2026-11-20T00:35:32.295+0000][189.692s][info][gc     ] GC(135) Pause Cleanup 832M->832M(1280M) 0.078ms
+[2026-11-20T00:35:32.296+0000][189.693s][info][gc     ] GC(135) Concurrent Mark Cycle 24.851ms

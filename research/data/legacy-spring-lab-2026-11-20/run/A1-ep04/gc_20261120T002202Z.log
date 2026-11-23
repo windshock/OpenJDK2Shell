@@ -1,0 +1,29 @@
+[2026-11-20T00:22:02.215+0000][0.005s][info][gc] Using G1
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc,heap] GC(0) Eden regions: 64->0(60)
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc,heap] GC(0) Survivor regions: 0->4(8)
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc,heap] GC(0) Old regions: 0->0
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc,heap] GC(0) Archive regions: 2->2
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc,heap] GC(0) Humongous regions: 0->0
+[2026-11-20T00:22:02.718+0000][0.509s][info][gc     ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 64M->4M(1280M) 4.506ms
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc,heap] GC(1) Eden regions: 60->0(58)
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc,heap] GC(1) Survivor regions: 4->6(8)
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc,heap] GC(1) Old regions: 0->0
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc,heap] GC(1) Archive regions: 2->2
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc,heap] GC(1) Humongous regions: 0->0
+[2026-11-20T00:22:02.887+0000][0.678s][info][gc     ] GC(1) Pause Young (Normal) (G1 Evacuation Pause) 64M->6M(1280M) 3.607ms
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc,heap] GC(2) Eden regions: 54->0(62)
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc,heap] GC(2) Survivor regions: 6->5(8)
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc,heap] GC(2) Old regions: 0->4
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc,heap] GC(2) Archive regions: 2->2
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc,heap] GC(2) Humongous regions: 0->0
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc     ] GC(2) Pause Young (Concurrent Start) (Metadata GC Threshold) 59M->8M(1280M) 7.100ms
+[2026-11-20T00:22:03.238+0000][1.029s][info][gc     ] GC(3) Concurrent Mark Cycle
+[2026-11-20T00:22:03.245+0000][1.036s][info][gc     ] GC(3) Pause Remark 10M->10M(1280M) 1.640ms
+[2026-11-20T00:22:03.248+0000][1.038s][info][gc     ] GC(3) Pause Cleanup 10M->10M(1280M) 0.095ms
+[2026-11-20T00:22:03.253+0000][1.044s][info][gc     ] GC(3) Concurrent Mark Cycle 14.935ms
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc,heap] GC(4) Eden regions: 64->0(82)
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc,heap] GC(4) Survivor regions: 5->8(9)
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc,heap] GC(4) Old regions: 4->4
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc,heap] GC(4) Archive regions: 2->2
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc,heap] GC(4) Humongous regions: 0->0
+[2026-11-20T00:22:14.729+0000][12.519s][info][gc     ] GC(4) Pause Young (Normal) (G1 Evacuation Pause) 72M->11M(1280M) 5.096ms

@@ -1,0 +1,274 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"app":"lab"},"name":"lab","namespace":"spring-lab"},"spec":{"containers":[{"args":["set -u\nif [ \"$ARM\" = \"A2\" ]; then\n  until [ -x /share/jdk1721/jdk/bin/java ]; do echo \"APP-WAITING-JDK1721\"; sleep 5; done\n  JAVA_BIN=/share/jdk1721/jdk/bin/java\nelse\n  JAVA_BIN=/opt/java/openjdk/bin/java\nfi\napt-get update -qq \u003e/dev/null 2\u003e\u00261; apt-get install -y -qq maven \u003e/dev/null 2\u003e\u00261\nmkdir -p /build/src/main/java/lab \u0026\u0026 cp /v/pom.xml /build/ \u0026\u0026 cp /v/AvatarApp.java /build/src/main/java/lab/\ncd /build \u0026\u0026 mvn -q -B package -DskipTests 2\u003e\u00261 | tail -3\nXFLAGS=\"\"\n[ \"$ARM\" = \"A3\" ] \u0026\u0026 XFLAGS=\"-XX:-UseBASE64Intrinsics\"\necho \"APP-SUPERVISOR-START arm=$ARM java_bin=$JAVA_BIN\"\n\"$JAVA_BIN\" -version 2\u003e\u00261 | head -2\nwhile true; do\n  GCLOG=\"/share/gc_$(date -u +%Y%m%dT%H%M%SZ).log\"\n  echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) jvm_start gclog=$GCLOG arm=$ARM\" \u003e\u003e /share/episode_log.txt\n  \"$JAVA_BIN\" --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED \\\n    --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED \\\n    --add-opens java.xml/com.sun.org.apache.xml.internal.dtm=ALL-UNNAMED \\\n    --add-opens java.xml/com.sun.org.apache.xml.internal.serializer=ALL-UNNAMED \\\n    -Xms1280m -Xmx1280m -Xlog:gc,gc+heap=info:file=$GCLOG:time,uptime,level,tags \\\n    -XX:ErrorFile=/share/hs_err_pid%p.log $XFLAGS \\\n    -jar target/avatar-svc-1.0.jar 2\u003e\u00261 | grep -vE 'Initializing|Completed init'\n  rc=${PIPESTATUS[0]}\n  echo \"$rc\" \u003e /share/last_exit\n  echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) java_exit=$rc arm=$ARM\" \u003e\u003e /share/episode_log.txt\n  sleep 2\ndone\n"],"command":["/bin/bash","-c"],"env":[{"name":"ARM","value":"A1"}],"image":"eclipse-temurin:17.0.8_7-jdk-jammy","name":"app","resources":{"limits":{"cpu":"3","memory":"3Gi"}},"volumeMounts":[{"mountPath":"/v","name":"v"},{"mountPath":"/share","name":"share"},{"mountPath":"/tmp","name":"tmp"}]},{"command":["/bin/bash","-c","apt-get update -qq \u003e/dev/null 2\u003e\u00261; apt-get install -y -qq python3 \u003e/dev/null 2\u003e\u00261; echo ATTACKER-READY; sleep infinity"],"image":"eclipse-temurin:17.0.8_7-jdk-jammy","name":"attacker","resources":{"limits":{"cpu":"1","memory":"1Gi"}},"volumeMounts":[{"mountPath":"/v","name":"v"},{"mountPath":"/share","name":"share"},{"mountPath":"/tmp","name":"tmp"}]}],"nodeName":"dfirtx-worker-dev01","restartPolicy":"Always","shareProcessNamespace":true,"volumes":[{"name":"v","projected":{"sources":[{"configMap":{"name":"app-src"}},{"configMap":{"name":"app-java"}},{"configMap":{"name":"scan-py"}},{"configMap":{"name":"campaign-py"}},{"configMap":{"name":"experiment-py"}},{"configMap":{"name":"c2-server"}},{"configMap":{"name":"agent-template"}},{"configMap":{"name":"stubs"}}]}},{"emptyDir":{},"name":"share"},{"emptyDir":{},"name":"tmp"}]}}
+  creationTimestamp: "2026-11-20T00:06:56Z"
+  generation: 1
+  labels:
+    app: lab
+  name: lab
+  namespace: spring-lab
+  resourceVersion: "48093103"
+  uid: 4cece1f9-9b83-405c-af1b-b33db410a13e
+spec:
+  containers:
+  - args:
+    - |
+      set -u
+      if [ "$ARM" = "A2" ]; then
+        until [ -x /share/jdk1721/jdk/bin/java ]; do echo "APP-WAITING-JDK1721"; sleep 5; done
+        JAVA_BIN=/share/jdk1721/jdk/bin/java
+      else
+        JAVA_BIN=/opt/java/openjdk/bin/java
+      fi
+      apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq maven >/dev/null 2>&1
+      mkdir -p /build/src/main/java/lab && cp /v/pom.xml /build/ && cp /v/AvatarApp.java /build/src/main/java/lab/
+      cd /build && mvn -q -B package -DskipTests 2>&1 | tail -3
+      XFLAGS=""
+      [ "$ARM" = "A3" ] && XFLAGS="-XX:-UseBASE64Intrinsics"
+      echo "APP-SUPERVISOR-START arm=$ARM java_bin=$JAVA_BIN"
+      "$JAVA_BIN" -version 2>&1 | head -2
+      while true; do
+        GCLOG="/share/gc_$(date -u +%Y%m%dT%H%M%SZ).log"
+        echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) jvm_start gclog=$GCLOG arm=$ARM" >> /share/episode_log.txt
+        "$JAVA_BIN" --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED \
+          --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED \
+          --add-opens java.xml/com.sun.org.apache.xml.internal.dtm=ALL-UNNAMED \
+          --add-opens java.xml/com.sun.org.apache.xml.internal.serializer=ALL-UNNAMED \
+          -Xms1280m -Xmx1280m -Xlog:gc,gc+heap=info:file=$GCLOG:time,uptime,level,tags \
+          -XX:ErrorFile=/share/hs_err_pid%p.log $XFLAGS \
+          -jar target/avatar-svc-1.0.jar 2>&1 | grep -vE 'Initializing|Completed init'
+        rc=${PIPESTATUS[0]}
+        echo "$rc" > /share/last_exit
+        echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) java_exit=$rc arm=$ARM" >> /share/episode_log.txt
+        sleep 2
+      done
+    command:
+    - /bin/bash
+    - -c
+    env:
+    - name: ARM
+      value: A1
+    image: eclipse-temurin:17.0.8_7-jdk-jammy
+    imagePullPolicy: IfNotPresent
+    name: app
+    resources:
+      limits:
+        cpu: "3"
+        memory: 3Gi
+      requests:
+        cpu: "3"
+        memory: 3Gi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /v
+      name: v
+    - mountPath: /share
+      name: share
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xslb5
+      readOnly: true
+  - command:
+    - /bin/bash
+    - -c
+    - apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq python3 >/dev/null
+      2>&1; echo ATTACKER-READY; sleep infinity
+    image: eclipse-temurin:17.0.8_7-jdk-jammy
+    imagePullPolicy: IfNotPresent
+    name: attacker
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /v
+      name: v
+    - mountPath: /share
+      name: share
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xslb5
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: dfirtx-worker-dev01
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  shareProcessNamespace: true
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: v
+    projected:
+      defaultMode: 420
+      sources:
+      - configMap:
+          name: app-src
+      - configMap:
+          name: app-java
+      - configMap:
+          name: scan-py
+      - configMap:
+          name: campaign-py
+      - configMap:
+          name: experiment-py
+      - configMap:
+          name: c2-server
+      - configMap:
+          name: agent-template
+      - configMap:
+          name: stubs
+  - emptyDir: {}
+    name: share
+  - emptyDir: {}
+    name: tmp
+  - name: kube-api-access-xslb5
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-20T00:06:57Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-20T00:06:56Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-20T00:06:57Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-20T00:06:57Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-20T00:06:56Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - allocatedResources:
+      cpu: "3"
+      memory: 3Gi
+    containerID: containerd://dd0ebd35ab1e9823eccbb22008b2c2352a1936e7d51b20708679ad098ee97280
+    image: docker.io/library/eclipse-temurin:17.0.8_7-jdk-jammy
+    imageID: docker.io/library/eclipse-temurin@sha256:bfc748eb9766e9c031bd79f6a37d5d7fcb1ba1adca56106fc4c661fa255340c8
+    lastState: {}
+    name: app
+    ready: true
+    resources:
+      limits:
+        cpu: "3"
+        memory: 3Gi
+      requests:
+        cpu: "3"
+        memory: 3Gi
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-11-20T00:06:57Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /v
+      name: v
+    - mountPath: /share
+      name: share
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xslb5
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - allocatedResources:
+      cpu: "1"
+      memory: 1Gi
+    containerID: containerd://c450b71fe04f325c6335c004dd6a52141675e233760a317fe74d52dad01b8de7
+    image: docker.io/library/eclipse-temurin:17.0.8_7-jdk-jammy
+    imageID: docker.io/library/eclipse-temurin@sha256:bfc748eb9766e9c031bd79f6a37d5d7fcb1ba1adca56106fc4c661fa255340c8
+    lastState: {}
+    name: attacker
+    ready: true
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-11-20T00:06:57Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /v
+      name: v
+    - mountPath: /share
+      name: share
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xslb5
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 172.21.116.80
+  hostIPs:
+  - ip: 172.21.116.80
+  phase: Running
+  podIP: 10.233.65.172
+  podIPs:
+  - ip: 10.233.65.172
+  qosClass: Guaranteed
+  startTime: "2026-11-20T00:06:56Z"
