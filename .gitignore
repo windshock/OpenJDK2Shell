@@ -12,3 +12,6 @@ exploit/results_diff.json
 # 클러스터 자격증명 — 절대 커밋 금지 (admin credential)
 kube/
 *.conf
+
+# 분석용 가상환경
+research/.venv/
