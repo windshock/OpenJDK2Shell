@@ -17,7 +17,7 @@ methodA)
   cat <<YAML | kubectl apply -f - >/dev/null
 apiVersion: v1
 kind: Pod
-metadata: {name: mA, namespace: $NS}
+metadata: {name: mech-a, namespace: $NS}
 spec:
   nodeName: dfirtx-worker-dev03
   restartPolicy: Never
@@ -40,7 +40,7 @@ buildB)
   cat <<YAML | kubectl apply -f - >/dev/null
 apiVersion: v1
 kind: Pod
-metadata: {name: bB, namespace: $NS}
+metadata: {name: build-b, namespace: $NS}
 spec:
   nodeName: dfirtx-worker-dev04
   restartPolicy: Never
@@ -67,10 +67,10 @@ YAML
   echo "buildB pod applied (fastdebug build ~2h) → ./run_mech.sh status"
   ;;
 status)
-  for p in mA bB; do $K get pod $p >/dev/null 2>&1 && { echo "== $p ($($K get pod $p -o jsonpath='{.status.phase}'))"; $K logs $p --tail="${N:-12}" 2>/dev/null; }; done
+  for p in mech-a build-b; do $K get pod $p >/dev/null 2>&1 && { echo "== $p ($($K get pod $p -o jsonpath='{.status.phase}'))"; $K logs $p --tail="${N:-12}" 2>/dev/null; }; done
   ;;
 pull)
-  mkdir -p "$HERE/out"; for p in mA bB; do $K get pod $p >/dev/null 2>&1 && $K logs $p > "$HERE/out/$p.log" 2>&1 && echo "pulled $p -> out/$p.log"; done
+  mkdir -p "$HERE/out"; for p in mech-a build-b; do $K get pod $p >/dev/null 2>&1 && $K logs $p > "$HERE/out/$p.log" 2>&1 && echo "pulled $p -> out/$p.log"; done
   ;;
 teardown) kubectl delete ns $NS --ignore-not-found --wait=false >/dev/null 2>&1; echo NS-CLEAN ;;
 *) sed -n 2,2p "$0"; exit 2 ;;
