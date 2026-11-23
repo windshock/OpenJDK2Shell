@@ -1,0 +1,9 @@
+{"run_id": "pilot2-2026-11-23",
+ "digests": {"17.0.8": "sha256:bfc748eb9766e9c031bd79f6a37d5d7fcb1ba1adca56106fc4c661fa255340c8",
+             "17.0.21": "sha256:acf46b4e646df812fd95c54669bc80d44acef68f0bde1dd420ea47897de0d637",
+             "17.0.21.1": "sha256:39a7842fefd685466676073a9507666c82e983af8936551c8c3cf825442a123a"},
+ "episodes": [
+  {"epid": "pilot2-01", "arm": "A1cand-17.0.8",  "jdk": "17.0.8",  "flags": "", "input": "malicious", "episode_class": "pilot", "K": 12},
+  {"epid": "pilot2-02", "arm": "A1cand-17.0.21", "jdk": "17.0.21", "flags": "", "input": "malicious", "episode_class": "pilot", "K": 12},
+  {"epid": "pilot2-03", "arm": "A1cand-17.0.21", "jdk": "17.0.21", "flags": "", "input": "malicious", "episode_class": "pilot", "K": 12}
+ ]}
