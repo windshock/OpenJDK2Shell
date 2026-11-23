@@ -8,7 +8,7 @@
 |---|---|---|
 | M1 OOB 쓰기 → 인접 live 객체 헤더 손상 | A (실제 취약 빌드, Unsafe 원시 읽기) | **관측** — 48바이트 연속 [0..47] |
 | M2 어느 필드가 손상되나 | A | **관측** — mark(0–7) + narrowKlass(8–11) + length(12–15) + body[0..31] 전부 |
-| M3 GC가 손상 객체를 밟음 | A (같은 run 크래시) + B (fastdebug 검증기) | A: **관측** (동일 서명) · B: 빌드 중 |
+| M3 GC가 손상 객체를 밟음 | A (같은 run 크래시) + B (fastdebug 검증기) | **관측** — A: 동일 서명 크래시 · B: VM이 손상 klass를 값과 함께 지목 |
 
 → 실험 A가 비워 둔 "기전 미관측" 칸과 CORRECTION-3 C-3("쓰기 폭 실측 아님")을 **직접 측정으로** 메움.
 
@@ -45,10 +45,35 @@ VERDICT: MECHANISM-OBSERVED (fields=mark klass length +body)
 **M3도 같은 run에서 관측:** 관측 직후 JVM이 `G1CMTask::process_grey_task_entry` SIGSEGV(exit, hs_err_pid31)로 사망.
 40-episode 실험의 크래시 6건과 **동일 프레임**. 즉 "헤더 손상 → GC가 그 객체를 밟음 → 크래시"가 한 run에서 연결 관측됐다.
 
-## Method B — fastdebug + VerifyBeforeGC/AfterGC (빌드 중)
+## Method B — fastdebug + VerifyBeforeGC/AfterGC (VM이 손상 klass를 지목)
 
-jdk-17.0.21.0.3-ga를 `--with-debug-level=fastdebug`로 빌드해 `-XX:+VerifyBeforeGC/+VerifyAfterGC`로 실행.
-힙 검증기가 손상 객체를 **주소·필드와 함께 지목**하는 VM-authored 증거를 추가 예정. (dev04, ~2h)
+jdk-17.0.21.0.3-ga를 `--with-debug-level=fastdebug`로 빌드(dev04)해 `-XX:+UnlockDiagnosticVMOptions
+-XX:+VerifyBeforeGC -XX:+VerifyAfterGC -Xlog:gc+verify`로 실행. 매 GC마다 힙 검증 패스가 돈다
+(`Verifying Before/After GC` GC(0)..GC(48)). trigger 후 강제 GC에서 **VM 자신의 어서션이 손상 klass를 잡았다**:
+
+```
+# Internal Error (hotspot/share/oops/compressedOops.inline.hpp:135)
+#  assert(check_alignment(result)) failed: address not aligned: 0x00007f4c3c9aa669
+# Problematic frame:
+#  V CompressedKlassPointers::decode_not_null(unsigned int, unsigned char*)+0x97
+# fastdebug build 17.0.21.0.3-internal
+```
+
+판독:
+- VM이 객체의 **compressed klass 포인터를 디코드**하다 `0x…9aa669`를 얻었다 — Method A가 측정한 손상 klass
+  값(post klass=0x699aa669 → 디코드 → `…9aa669`)과 **정확히 일치**. fastdebug의 `check_alignment` 어서션이
+  그 값을 잡고 코드 위치(`decode_not_null`, `compressedOops.inline.hpp:135`)까지 지목했다.
+- 제품 빌드의 무작위 SIGSEGV 대신, **VM이 손상 klass를 값·위치와 함께 결정적으로 지목**한 것 = "GC가 손상
+  객체를 밟는다"의 VM-authored 증거. M2(klass 손상)·M3(그 klass를 따라가다 치명)을 한 번에 확정.
+- 로그: `research/mechanism/out/build-b.log`.
+
+## 결론
+
+세 단계가 **독립 두 방법으로 교차 확인**됐다: OOB 64B store의 꼬리 48B가 인접 live 객체 헤더
+(mark+klass+length+body)를 디코드 가비지로 덮고(M1·M2, Method A 바이트 실측), GC가 그 객체의 klass를
+따라가다 사망한다(M3 — Method A 동일-서명 크래시 + Method B fastdebug 어서션이 손상 klass 값 지목).
+실험 A의 인과(취약 6/10 vs 대조 0/10)에 **기전**이 붙었다. length는 음수라 유출·승격은 이 배치에서
+여전히 막힌다(관측이지 승격 아님).
 
 ## 범위 (불변)
 값·부호 **제어**, 읽기/쓰기 primitive, 정보 유출, 코드 실행은 하지 않았다. 본 결과는 "손상이 어디에
