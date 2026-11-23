@@ -5,6 +5,18 @@
 
 작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E PWNED + 관제 공유 pcap)
 
+## 0. 현재 상태 (2026-11-23 갱신 — 이 절이 최신)
+
+- **활성 계획:** `RESEARCH-PLAN-2026-11-23.md` (v2.0) · 사전등록 `research/PREREG-2026-11-23.md` (잠금 커밋 5fbe402)
+- **완료:** 트랙 C 정정(`CORRECTION-3.md` C-1~C-10), 트랙 D 방어 문서(DEFENDER-GUIDE v5), Phase 0 랩, 파일럿
+- **진행 중:** 실험 A 본수집 `main-2026-11-23` — 클러스터 ns `j4s-research`, 노드 dev02
+  - 상태: `research/lab/lab.sh status` · 회수: `research/lab/lab.sh pull main-2026-11-23` · 중단: `lab.sh stop`
+  - 재개: 드라이버는 `DONE` 표시된 episode를 건너뛰므로 `lab.sh run research/schedules/main-2026-11-23.json` 재실행으로 이어감
+- **분석:** `python3 research/analysis/analyze.py research/data/main-2026-11-23/attempts_all.jsonl --out …` +
+  `research/.venv/bin/python research/analysis/crosscheck.py …` (venv: numpy/scipy/sklearn, requirements.txt)
+- kubeconfig: `kube/dfirtx-dev.conf` (gitignore, 600)
+- 아래 §1~§9는 11/18 기준 기록 — 바이트 수·Keycloak·TLAB 서술은 CORRECTION-3로 정정됨
+
 ## 1. 프로젝트 한 줄 요약
 
 OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대응 프로젝트.
