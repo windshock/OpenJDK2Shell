@@ -1,9 +1,10 @@
-# 방어자 가이드 — OpenJDK 17.0.6+ Base64 OOB (Java4Shell) 대응 (v5 — 2026-11-23 영향 조건·수정 빌드·완화 보강)
+# 방어자 가이드 — OpenJDK 17.0.6+ Base64 OOB (Java4Shell) 대응 (v6 — 2026-11-25 코드 실행 단계 지표·적용 범위 보강)
 
 > **⚠ 2026-11-23 정정 반영** — `CORRECTION-3.md` 참조 (정정 전 문장은 그 문서에 원문 보존).
+> **v6 (2026-11-25)** — 코드 실행 두 체인(11/24)과 그 적용 범위(11/25)를 반영: §0 표, §1, §3-A, §3-E ⑥, §3-F·§4-E3 신설, §6, §8.
+> 근거: `exploit/E2E-EXPLOIT-SUITE.md` 체인 5·6과 후속 절. 인프라·관제용 정리: `MONITORING-CHECKLIST-2026-11-25.md`.
 
-
-작성일: 2026-11-17 · 갱신: 2026-11-18 (v4 — CVE-2026-114938 = Base64 AVX-512 assembly OOB 확정)
+작성일: 2026-11-17 · 갱신: 2026-11-25 (v6 — 코드 실행 단계 지표·적용 범위. v5 11/23 영향 조건·수정 빌드·완화, v4 11/18 CVE 확정)
 · 대상: 인프라·SOC·서비스 담당
 근거: KISA ISMS인증팀 공문(11/17) + OpenJDK Advisory 2026/11/17 + jdk17u 소스 검증(11/18)
 
@@ -25,7 +26,7 @@
 
 | 클래스 | 크래시 | 자식프로세스 | 아웃바운드 | 탐지 가능성 |
 |---|---|---|---|---|
-| **Base64 OOB (본 CVE)** | 실패 시 hs_err / 성공 시 힙 커럽션 | 없음 | 없음 | **§3-D/E** (hs_err·커럽션·길이 이상) |
+| **Base64 OOB (본 CVE)** | 실패 시 hs_err. 코드 실행에 성공한 랩 실행은 JVM 생존·hs_err 0 | **승격되면 있음** — 랩 체인 6은 셸 없이 `touch`를 직접 실행 (v6) | 랩에서는 없음 | **§3-D/E/F** (hs_err·커럽션·길이 이상·응답 지표) |
 | 역직렬화 가젯 | 없음 | 있을 수 있음 | 있을 수 있음 | §3-A/3-B |
 | JNDI/LDAP | 없음 | 있을 수 있음 | 있음 | §3-B |
 | C2 계산정확성 (8389989, 별개) | 없음 | 없음 | 없음 | 잘못된 계산 결과 모니터링 |
@@ -65,6 +66,7 @@ v3 §4-E의 우선순위를 뒤집었다(해당 서술은 v4에서 폐기).
 - **진범(CVE-2026-114938) 영향**: Java 17.0.6~17.0.21.0.x (hotspot/compiler). 타 라인: 21·25·27은 §5 수정 빌드 미만이 영향.
   **표준 OpenJDK 8/11은 decode intrinsic이 없어 무영향**, 단 Oracle Java SE 8 Performance Pack(8u511b33-perf)은 영향(8u513-perf 수정).
   (v4의 "8·11 … 전 라인" 표기는 과잉 — v5 정정)
+  - **11/25 실측**: Temurin 21.0.13+9(수정 전 빌드)에서도 같은 손상(인접 배열의 length)이 관측됐다 — 랩 모델 3회, 모두 첫 트리거 시도에서.
 - **별개 실증 취약점 (우리가 발견)**:
   - TemplatesImpl 역직렬화 RCE: 17.0.0~17.0.20 (SecurityManager=null 기본값)
   - LDAP trustSerialData=true: 17.0.6~17.0.12 (기본값 true)
@@ -90,7 +92,7 @@ ps -eo pid,comm,args | grep -i '[j]ava' | awk '{print $1}' | while read p; do
 
 ## 3. 탐지
 
-### 3-A. JVM 자식 프로세스 (역직렬화 RCE 페이로드 단계에서 유효)
+### 3-A. JVM 자식 프로세스 (역직렬화 RCE 페이로드 단계, Base64 OOB 코드 실행 단계)
 
 ```bash
 # Linux auditd
@@ -98,6 +100,11 @@ ps -eo pid,comm,args | grep -i '[j]ava' | awk '{print $1}' | while read p; do
 -a always,exit -F arch=b64 -S execve -F exe=/bin/bash  -k java_child
 -a always,exit -F arch=b64 -S execve -F exe=/usr/bin/curl -k java_child
 ```
+
+> **v6 — 고정 경로 목록만으로는 놓친다.** 랩 체인 6은 `Runtime.exec(String)`로 **셸을 거치지 않고 `touch`를 직접** 실행했다.
+> 위처럼 `sh`·`bash`·`curl`만 보는 규칙에는 걸리지 않는다. **부모가 java인 `execve`를 전부 기록**하고(auditd execve 전체 + ppid 연계,
+> Falco·EDR의 프로세스 계보), 서비스별 평상 패턴과 비교한다. 자식 프로세스는 JVM의 권한을 그대로 물려받는다
+> (랩에서는 컨테이너 root, uid 0). 상세: `MONITORING-CHECKLIST-2026-11-25.md`.
 
 ### 3-B. 예상 외 아웃바운드 (JNDI/RMI 콜백 — 페이로드가 콜백하는 경우 유효)
 
@@ -170,11 +177,39 @@ java -XX:StartFlightRecording=duration=60s,filename=/tmp/jfr/health.jfr,maxsize=
 > ⑤ **(체인 6) 토큰·권한 인터페이스 없이도 됨:** OOB 쓰기 3건 + 요청 1건(`GET /actions/upper?arg=touch%20/tmp/…`)으로 JVM이 자식 프로세스를 만들었다.
 > 가장 직접적인 신호는 **java 프로세스의 예기치 않은 자식 프로세스**(실행 감사·auditd·Falco). 앱 로그에는 무해한 핸들러가
 > `{"result":"Process[pid=…]}`를 돌려주거나, 실패한 시도의 `IllegalArgumentException: object is not an instance of declaring class`가 남는다.
+> ⑥ **(11/25) 실패한 시도의 다른 서명:** 리플렉션 호출의 반환 값을 문자열화하는 프레임(`java.lang.String.valueOf`, C1 코드)에서 `SIGSEGV`.
+> 그 설정(CDS를 끈 랩 JVM, 3회)에서는 그 슬롯이 `long`을 돌려주는 메서드(`freeMemory`)라, 원시값이 객체로 취급됐다. §3-F의 예외 지표와 함께 본다.
 
 ```bash
 find <앱작업디렉토리> -name 'hs_err_pid*.log' -newermt '-1 hour' \
   -exec grep -lE 'SIGSEGV|SIGBUS|loop|opto' {} \;
 ```
+
+### 3-F. 코드 실행 단계의 지표 (v6 — 2026-11-25, 랩 모델 실측)
+
+`exploit/E2E-EXPLOIT-SUITE.md` 체인 5·6을 원격에서 실행하며 본 것. 피해자는 랩 모델(`J4sRceVictim`)이고 실제 애플리케이션에서 재현한 것은
+JVM 크래시까지라, 아래는 **관측 지점의 후보**이지 확정 시그니처가 아니다.
+
+| 지표 | 어디서 보이나 | 뜻 | 한계 |
+|---|---|---|---|
+| **응답 본문의 `Process[pid=`** | 평소 문자열·JSON을 돌려주는 API의 응답. 정칙 `Process\[pid=\d+` | 문자열을 돌려줘야 할 리플렉션 호출이 `Runtime.exec`로 바뀌고, 그 반환 객체(`Process.toString()`)가 그대로 응답에 실린 것 | Java4Shell 전용이 아니다. sqlmap의 SSTI 판정 로직(`lib/techniques/ssti/inject.py`)에도 "명령은 실행됐지만 stdout을 잡지 못한 blind exec"으로 이미 들어 있다. 공격자가 결과를 돌려주지 않으면 안 보인다. TLS 구간은 복호화하거나 앱·게이트웨이 시점에서만 보인다 |
+| **핸들러 예외** | 애플리케이션 로그 | 호출 대상 바꿔치기가 **실패**한 흔적 | 정상 앱의 리플렉션 오용·라이브러리 버그와 겹칠 수 있다 |
+| **java의 예기치 않은 자식 프로세스** | 실행 감사(auditd·Falco·EDR) | 가장 직접적인 신호 (§3-A) | 컨테이너·호스트 PID와 요청 시각을 연결해야 쓸 수 있다 |
+| **트리거 직후의 요청 패턴** | 접근 로그·pcap | MB급 본문이 `=`로 끝나며 거부(400)된 직후, 저장 크기를 넘는 offset의 범위 읽기·부분 수정 | 그런 API가 있는 서비스에만 해당한다 (§3-E ③) |
+
+핸들러 예외는 랩에서 세 가지를 봤다.
+
+- `IllegalArgumentException: object is not an instance of declaring class` — 수신자가 선언 클래스의 인스턴스가 아닐 때.
+- **JDK 18 이상**: `NullPointerException: Cannot invoke "java.lang.invoke.MethodHandle.asFixedArity()" because "dmh" is null`.
+  JDK 18부터 기본 리플렉션이 메서드 핸들 기반이라(JEP 416) 접근자를 만들 때 선언 클래스·이름·시그니처로 메서드를 찾는데,
+  `Method` 객체의 그 셋이 서로 맞지 않아 찾지 못한 것이다 (Temurin 21.0.13+9 랩, 한 JVM에서 202건).
+- 존재하지 않는 메서드를 가리키는 `NoSuchMethodError` — 랩에서는 `'java.lang.String java.lang.Class.upper(java.lang.String)'`.
+
+**시간 관계(1회 실측):** 트리거 요청 약 8초 뒤에 코드 실행 요청 1건이 왔고, 전체 실행은 60초 안에 끝났다. 연관 탐지 창은 분 단위가 아니라
+초 단위로 잡는다. 구간별 시각은 `exploit/results/pcap/j4s-chain6-remote/j4s-chain6-remote-README.txt`.
+
+**캡처의 한계:** 공유 pcap는 패킷당 96바이트(`tcpdump -s 96`)만 담고 있어 요청 라인과 헤더 앞부분은 보이지만 **응답 본문은 보이지 않는다**
+(랩 캡처 두 개에서 패킷의 63~65%가 잘림). 응답 본문 지표는 이 pcap로는 검증할 수 없고, 전체 길이 캡처나 액세스 로그·APM이 따로 필요하다.
 
 ## 4. 완화 — KISA 5-다
 
@@ -218,6 +253,19 @@ JAVA_TOOL_OPTIONS="-XX:UseAVX=2"
 `UseAVX>2` 조건이 깨지므로 Base64 intrinsic 에르고노믹스가 활성화되지 않는다 (`vm_version_x86.cpp`).
 대신 **AVX-512 기반 최적화 전체를 포기**하므로 성능 영향 범위가 넓다. §4-E를 쓸 수 없는 경우
 (옵션 화이트리스트 등)에만 고려하고, 적용 후 같은 방법으로 `UseAVX`·`UseBASE64Intrinsics`를 확인한다.
+
+### 4-E3. 이것들은 완화가 아니다 (v6 — 2026-11-25 실측)
+
+랩 체인 6(메모리 손상만으로 `Method.invoke`를 `Runtime.exec`로 바꾸는 경로)이 동작하지 않는 조건을 확인했다.
+**그 구현 하나가 깨졌을 뿐, 취약점은 그대로이고 다른 경로는 막히지 않는다.** 완화는 §4-E, 근본 대응은 §5뿐이다.
+
+| 조건 | 체인 6 | 취약점·다른 경로 | 왜 |
+|---|---|---|---|
+| JDK **17 라인 + CDS 기본 아카이브** | 됨 — 11/11 (빌드별 측정값 없이도) | — | 체인 6은 이 범위에서만 성립한다 |
+| `-Xshare:off` (CDS 아카이브 끔) | 안 됨 — 0/3 | 취약점은 그대로. **체인 5는 6/6 정상** | 메서드 슬롯 번호가 실행 설정마다 달라진다 |
+| JDK **18 이상**의 기본 리플렉션 | 안 됨 | Temurin 21.0.13+9에서도 손상 관측(랩 3회) | 기본 리플렉션이 메서드 핸들 기반이라 호출 시점에 슬롯을 읽지 않는다(JEP 416). 구형 접근자 플래그(`jdk.reflect.useDirectMethodHandle=false`)를 켜면 됨(랩 1/1) |
+
+`-Xshare:off`나 리플렉션 설정을 "완화"로 쓰지 않는다. 실제 서비스에서 저 경로가 되는지는 측정하지 않았다(랩 모델).
 
 ### 4-A. 역직렬화 (별개 취약점 — 계속 유효)
 
@@ -294,7 +342,8 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
 1. §3-A/3-B 경보 발생 호스트 **격리** (네트워크 차단, 종료 금지 — 메모리 보존)
 2. 수집: `ps`/`/proc` 트리, 네트워크 연결, 최근 생성 파일, 앱 로그
-3. 지표: java 자식 셸, 미지 아웃바운드, `/tmp` 신규 바이너리
+3. 지표: java 자식 프로세스(**셸을 거치지 않는 직접 실행 포함** — §3-A), 응답·로그의 `Process[pid=`와 리플렉션 예외(§3-F),
+   미지 아웃바운드, `/tmp` 신규 파일
 4. **C2 JIT 침해의 경우**: 성공한 페이로드는 위 지표가 없을 수 있으나,
    JFR 녹화(§3-D)에서 Compilation/Deoptimization 이상, 잘못된 계산 결과,
    실패한 시도의 hs_err 덤프를 확인. **완전히 흔적이 없는 것은 아님**.
@@ -331,3 +380,7 @@ tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
   `-XX:-UseBASE64Intrinsics` 대조 CLEAN(**완화 실효 입증**).
   상세: `OOB-OBSERVATION-2026-11-18.md`. 성공한 OOB 직후 JVM SIGABRT —
   **급사하는 Java 프로세스 + hs_err/코어 덤프가 운영 탐지 신호**.
+- **코드 실행 실증의 범위 (v6, 11/25)**: 체인 5·6 모두 피해자는 랩 모델이다. 실제 애플리케이션에서 재현한 것은 JVM 크래시(DoS)까지다.
+  체인 6은 **JDK 17 라인 + CDS 기본 아카이브**로 한정된다(§4-E3). "크래시가 없으니 안전"도 "JVM이 살아 있으니 무사"도 성립하지 않는다.
+- **응답 본문 지표의 검증 공백 (v6)**: 공유 pcap는 96바이트 단위 캡처라 `Process[pid=` 응답 룰을 그걸로 검증하지 못했다.
+  전체 길이 캡처나 애플리케이션 로그로 탐지률·오탐을 재기 전에는 후보로만 둔다.

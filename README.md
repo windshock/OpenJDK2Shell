@@ -62,9 +62,10 @@ NCSC 공지(2026-11-16, "OpenJDK Java 17.0.6 이상, 인증 없는 RCE, CVSS 9.2
 
 - **패치는 공개·확인됐다.** 17.0.21.1 (커밋 `8ea73158af`). 자체 빌드 17.0.21.1에서 OOB 미관측 — `exploit/results/jdk17u-build-and-canary.log`.
 - **실증 흐름:** OOB 직접 관측(11/18) → DoS 인과 확인·기전 실측(11/23) → 코드 실행 두 체인(11/24) → 체인 6 후속: 미러 상수 제거·한계 확정(11/25).
-- **대응 자료:** `DEFENDER-GUIDE.md`, `OPS-SHARING-2026-11-18.md`, `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md`, `KISA-REPLY-2026-11-20.md`.
+- **대응 자료:** `DEFENDER-GUIDE.md` (v6), `MONITORING-CHECKLIST-2026-11-25.md`, `OPS-SHARING-2026-11-18.md`, `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md`, `KISA-REPLY-2026-11-20.md`.
 - **열린 문제:** 체인 6의 JDK 18 이상 기본 경로(MethodHandle)는 만들지 않았다 · CDS를 끈 JVM에서 슬롯을 힙에서 읽는 방법은 찾지 못했다 ·
-  실제 애플리케이션 대상 코드 실행은 입증하지 않았다. 후속 후보는 `HANDOFF.md` §6.
+  실제 애플리케이션 대상 코드 실행은 입증하지 않았다 · 응답 본문(`Process[pid=`) 탐지 룰은 검증하지 못했다(공유 pcap가 96바이트 단위 캡처라 응답 본문이 없다) ·
+  후속 후보는 `HANDOFF.md` §6.
 
 ## 저장소 구성
 
@@ -108,7 +109,8 @@ AVX-512 VBMI CPU 노드와 kubectl 접속 설정(저장소 미포함)이 필요�
 | `OOB-OBSERVATION-2026-11-18.md` | OOB 직접 관측 보고서 — 메커니즘·레시피·매트릭스 |
 | `research/RESULTS-2026-11-23.md` | DoS 인과 실험 결과 (사전등록 기반) |
 | `exploit/E2E-EXPLOIT-SUITE.md` | E2E 익스플로잇 아키텍처 — 체인 1~6, 결과·전제·한계 |
-| `DEFENDER-GUIDE.md` | 대응 가이드 — 완화·탐지 신호 |
+| `DEFENDER-GUIDE.md` | 대응 가이드 (v6) — 완화·탐지 신호, 코드 실행 단계의 지표와 적용 범위 |
+| `MONITORING-CHECKLIST-2026-11-25.md` | 인프라·관제용 체크리스트 — 우선순위·한 실행의 요청 순서·수집 시 주의 |
 | `OPS-SHARING-2026-11-18.md`, `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md` | 관제 공유 문서 — 와이어 시그니처·탐지룰·로그 패턴 |
 | `KISA-REPLY-2026-11-20.md` | KISA 회신 초안 |
 

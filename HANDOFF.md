@@ -22,6 +22,9 @@
 - 변경: `exploit/j4s_rce.py`(`--runtime-pick oracle`·`--exec-slot`·`--gdf-slot`), `j4s_rce.sh`(`img` 모드, `ATK_ARGS`, `EXTRA_JVM`, 크래시 요약 저장),
   `lab_rce.sh`(start가 `DEVFLAGS`를 넘김 — 전에는 정의만 되고 안 쓰였다), `src/J4sRceVictim.java`(dev `/dev/label`, 핸들러가 던진 예외의 원인 로그),
   신규 `runtime_study.sh`. 산출물: `results/rce-*-20261125-*`, `results/runtime-struct/`(17.0.21+9·17.0.8+7·CDS 끔 라벨 대조 데이터).
+- **대응 자료 갱신 (11/25):** `DEFENDER-GUIDE.md` v6 — §3-F 코드 실행 단계 지표(응답 본문 `Process[pid=`, 실패한 호출의 예외, 캡처 한계),
+  §3-A 자식 프로세스(셸 없는 직접 실행), §4-E3 완화가 아닌 것(`-Xshare:off`·JDK 18 이상 리플렉션 설정), 버전·날짜 표기.
+  `MONITORING-CHECKLIST-2026-11-25.md` 신설(인프라·관제용). 같은 날 main을 `rce-chain5-6`까지 fast-forward.
 
 ### 11/24 — 체인 6: Java4Shell → 메모리 손상만으로 JVM 코드 실행, 랩 모델
 
@@ -92,7 +95,7 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 ## 2. 저장소 위치·환경
 
 - 로컬: `~/Downloads/OpenJDK2Shell` (구 경로 `~/Downloads/OpenJDK`는 심볼릭 링크)
-- GitHub: https://github.com/windshock/OpenJDK2Shell (private, 협업자 HeeRPOU 초대됨)
+- GitHub: https://github.com/windshock/OpenJDK2Shell (**PUBLIC** — 11/18 전환, §9. 전에는 private·협업자 HeeRPOU 초대)
 - jdk17u 클론: `~/Downloads/OpenJDK2Shell/jdk17u` (blobless — **전트리 git grep 금지,
   blob 폭탄 ENOSPC 전례**, 경로 한정 git show만)
 - kubeconfig: `kube/dfirtx-dev.conf` (admin, git 제외, 600)
@@ -121,7 +124,8 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | `candidate-triage-2026-11-17.md` | 후보 triage (+§7 검증 결과) — JIT 미순위 교훈 포함 |
 | `PHASE-B-VERDICT.md` | ⚠ **부분 폐기** — CVE↔8389989 매핑은 오인 (CORRECTION-2 참조) |
 | `CORRECTION.md` / `CORRECTION-2.md` | 정오표 2건 — 과장 주장 정정 이력 |
-| `DEFENDER-GUIDE.md` | **v4** (Base64 확정·OOB 실측 반영; v3의 C2 중심 서술 폐기) |
+| `DEFENDER-GUIDE.md` | **v6** (11/25 — 코드 실행 단계 지표 §3-F·적용 범위 §4-E3. v4 11/18 Base64 확정·OOB 실측, v3의 C2 중심 서술 폐기) |
+| `MONITORING-CHECKLIST-2026-11-25.md` | 인프라·관제용 체크리스트 — 우선순위·한 실행의 요청 순서·수집 시 주의·검증 범위 |
 | `KISA-REPLY-2026-11-20.md` | **KISA 회신 초안** — 컴포넌트·하한·완화 전부 소스 검증 완료 |
 | `OOB-OBSERVATION-2026-11-18.md` | **OOB 직접 관측 보고서** — 메커니즘·레시피·매트릭스·포렌식 |
 | `deep-analysis-*.md` (C1~C7, A1~A4) | 후보별 심층 분석 |
@@ -176,6 +180,9 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | E2E 코드 | `exploit/src/Java4ShellE2EVictim.java` + `ops/e2e_java4shell_attacker.sh` + `exploit/e2e_java4shell.sh` |
 | **체인 5 (11/24): OOB 읽기·쓰기 → 코드 실행(캐나리)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 5 — `exploit/src/J4sRceVictim.java` + `exploit/j4s_rce.py` + `exploit/j4s_rce.sh` |
 | 체인 5 결과 | `exploit/results/rce-{vuln,1708,mitig,patched}-2026-11-24-*/` (취약 9/9 캐나리, 완화·패치 손상 0) |
+| **체인 6 (11/24)·후속 (11/25)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 6과 후속 절 — `exploit/results/rce-*-20261125-*/` |
+| 체인 5·6 원격 pcap 묶음 | `exploit/results/pcap/j4s-chain5-remote-share.tar.gz`, `j4s-chain6-remote-share.tar.gz` (snaplen 96 — 요청 라인은 보이고 응답 본문은 범위 밖) |
+| 인프라 모니터링 체크리스트 (11/25) | `MONITORING-CHECKLIST-2026-11-25.md` |
 | E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회, JVM 크래시(DoS) 5회) / `results/hbase_*_vuln.log` (실앱 JVM 크래시 2회) |
 | 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
 
