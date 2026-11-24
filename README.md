@@ -6,15 +6,19 @@ NCSC 공지(2026-11-16, "OpenJDK Java 17.0.6 이상, 인증 없는 RCE, CVSS 9.2
 Oracle 패치 공개 예정")에 대응해, 패치가 공개되는 즉시 수정 내용을 확인하기 위한 모니터링
 환경이다. **현재(작성 시점) 이번 취약점의 수정 코드는 공개 저장소에 아직 없다.**
 
-## 결과 분류 (2026-11-23 — 이 표가 최신 판정)
+## 결과 분류 (2026-11-24 — 이 표가 최신 판정)
 
 | 범주 | 이 저장소의 판정 | 근거 |
 |---|---|---|
 | Java4Shell OOB 쓰기 | **실측** — 인접 객체 헤더 length 손상 관측, 완화·수정 빌드에서 CLEAN | `OOB-OBSERVATION-2026-11-18.md`, `CORRECTION-3.md` |
 | Java4Shell → JVM 크래시 (DoS) | **실측 + 인과 확인** — 취약 6/10 vs 패치·완화·정상 입력 0/10 | `research/RESULTS-2026-11-23.md` |
-| Java4Shell → 정보 유출 | **입증 안 됨** (시도는 미달, 이후 측정 범위 밖) | `ESCALATION-STATUS-2026-11-18.md` |
-| Java4Shell → 코드 실행 (RCE) | **입증 안 됨.** 외부 보고는 REPORTED (Calif·Hadrian·VulnCheck) | `CORRECTION-3.md` C-7 |
+| Java4Shell → 정보 유출 | **실측(랩 모델, 11/24)** — 손상된 length로 힙 449 MiB를 읽어 인접하지 않은 객체의 ops 세션 토큰 회수. 실앱 대상 아님 | `exploit/E2E-EXPLOIT-SUITE.md` 체인 5 |
+| Java4Shell → 코드 실행 (RCE) | **실측(랩 모델, 11/24)** — 두 경로. ① 메모리 손상만: OOB 쓰기 3건으로 피해자의 `Method.invoke`를 `Runtime.exec`로 바꿔 호출(체인 6, 취약 JDK 8/8, 완화·패치 0/2). ② 앱 로직 승격: OOB 읽기로 ops 토큰을 회수해 토큰 보호 exec 인터페이스 호출(체인 5, 취약 JDK 17/17). 실앱 대상 아님. 외부 보고는 REPORTED (Calif·Hadrian·VulnCheck) | `exploit/E2E-EXPLOIT-SUITE.md` 체인 5·6, `CORRECTION-3.md` C-7 |
 | 역직렬화 체인 (RMI/LDAP → TemplatesImpl) 코드 실행 | **실측** — 단 CVE-2026-114938과 **별개**, serialFilter=null·add-opens/exports 조건 | `exploit/E2E-EXPLOIT-SUITE.md` 체인 1·2·1+ |
+
+두 체인 모두 **GC가 없는 구간 안에서만** 성립한다 — 손상 뒤 GC가 오면 JVM은 죽는다(체인 5 §왜 되는가 6).
+
+11/23까지는 정보 유출·코드 실행 둘 다 "입증 안 됨"이었다(`ESCALATION-STATUS-2026-11-18.md`, `CORRECTION-3.md` C-7). 11/24에 바뀐 것과 그 전제·한계는 체인 5 절에 있다.
 
 문서 곳곳의 "PWNED"는 체인 3·4(Java4Shell)에서는 **JVM 사망(DoS)**을 뜻한다 (CORRECTION-3 C-11).
 

@@ -5,7 +5,50 @@
 
 작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E JVM 크래시(DoS) 재현 + 관제 공유 pcap)
 
-## 0. 현재 상태 (2026-11-23 17:10 KST 갱신 — 이 절이 최신)
+## 0. 현재 상태 (2026-11-24 갱신 — 이 절이 최신)
+
+### 11/24 — 체인 6: Java4Shell → 메모리 손상만으로 JVM 코드 실행, 랩 모델
+
+- **결론:** `exploit/E2E-EXPLOIT-SUITE.md` 체인 6. 토큰도 권한 인터페이스도 없이, OOB 읽기로 힙의 `Method`·`Runtime.class` 미러·`Runtime` 인스턴스를
+  찾은 뒤 OOB 쓰기 3건(각 4바이트)으로 그 `Method`를 `Runtime.exec(String)`으로 바꾸고 무해한 핸들러(`/actions/upper`)을 호출 → JVM이 명령 실행.
+  취약 JDK **8/8**(17.0.21+9 6/6 — 원격 1회 포함, 17.0.8+7 2/2), 완화·패치는 트리거 3발씩 손상 0. victim 생존 8/8.
+  **피해자는 랩 모델이며 실앱 대상이 아니다. 빌드별 측정 상수(미러 거리·klass·`exec` idnum)가 필요하다.**
+- 같은 8회에서 체인 5(토큰 회수 → `/ops/exec`)도 8/8 다시 확인. 누적으로 체인 5는 17/17.
+- 핵심: ① 호출이 읽는 것은 앱이 가진 `Method` 사본이 아니라 그 `root`(`ReflectionFactory.newMethodAccessor`) ② 네이티브 호출 경로 검사는
+  수신자·인자 수·인자 타입 셋 — `(String)` 시그니처라 통과 ③ `Runtime` 미러는 이름이 아니라 **빌드 상수**로 찾는다(`Class.name`은 지연 초기화).
+- **관측 효과 교훈:** dev 열람(`-Dj4s.dev.layout`)이 `getName()`을 불러 `Runtime` 미러 이름을 풀어줬다 → dev에서만 되고 프로덕션 첫 배치는 5/5 실패.
+  관측 도구가 대상 상태를 바꿀 수 있으니 dev 결과는 반드시 프로덕션 플래그로 재확인할 것.
+- 원격 실행(이 PC → NodePort 31883): 2026-11-24 21:55:01.844~21:56:01.673 KST, TCP 세션 2개(업로드 958·1,327 MiB, 다운로드 628 MiB).
+  트리거(21:55:40.9) 약 8초 뒤 `GET /actions/upper?arg=touch…` 1건으로 실행. 공유 묶음 `exploit/results/pcap/j4s-chain6-remote-share.tar.gz`.
+
+### 11/24 — 체인 5: Java4Shell → OOB 읽기·쓰기 → 코드 실행(캐나리), 랩 모델
+
+- **결론:** `exploit/E2E-EXPLOIT-SUITE.md` 체인 5. 취약 JDK(17.0.21+9 **7/7**, 17.0.8+7 **2/2** — 체인 6 배치에서 추가로 8/8)에서 무인증 공격자가
+  OOB 읽기로 ops 세션 토큰을 회수해 `/ops/exec`를 호출(캐나리 파일, uid 0). 완화·패치는 트리거 3발씩 손상 0.
+  **앱 로직 승격이다. 피해자는 랩 모델(`J4sRceVictim`)이며 실앱 대상이 아니다.** (JVM 내부 직접 실행은 같은 날 체인 6으로 입증.)
+- 11/23의 "유출 UNESTABLISHED"가 바뀐 이유: 음수 length(`0xa6699aa6`)도 부호 없는 경계 검사를 통과해 **인덱스 단위** OOB 읽기·쓰기가 된다.
+  양수 length가 필요한 것은 배열을 통째로 반환하는 경로뿐이다.
+- 트리거 배치는 힙 상태가 정한다: IHOP 위(기존 1 GB 70% 채움)에서는 humongous 할당이 할당 전에 동시 마킹을 깨워 DoS.
+  IHOP 아래(2 GB에 700 MiB)에서는 young GC의 eager reclaim 뒤 구멍이 가장 낮은 5-리전이 되어 1발째에 결정적으로 놓인다(17/17).
+- 트래픽(1회 실측): keep-alive 연결 **1개**에 요청 31,597건·송신 3,277 MiB·수신 449 MiB·약 26초. "세션당 100 MB 업로드" 류의 볼륨 룰에 걸리지만(32배)
+  그건 연결을 하나만 쓴 구현 선택이라 — 단일 최대 요청은 6.67 MiB. 더 특이적인 신호는 체인 5 §트래픽 프로파일에 정리.
+- **원격 실행(이 PC → 클러스터)**: `REMOTE=1 ./j4s_rce.sh vuln 1` — 공격자를 작업 PC(`10.202.211.14`)에서 NodePort 31883으로. 체인 성공 1/1.
+  와이어(victim eth0 pcap): TCP 세션 2개(963 MiB·2,337 MiB 업로드), 다운로드 495 MiB, 67초, 2026-11-24 19:35:33~19:36:40 KST.
+  파드 캡처에는 소스가 노드 SNAT 주소(`10.233.68.1`)로 보임 — 관제 대조는 노드 외부 인터페이스 기준.
+- 손상 뒤 GC — **생존은 보장되지 않는다(정정).** 처음엔 "young GC 5회 통과"라고 적었으나 그건 배치가 운 좋았던 run이었다. young GC 준비 단계가 모든 humongous 객체의 klass를
+  읽으므로(`humongous_region_is_candidate` → `is_typeArray`), 깨진 klass가 읽기 가능한 주소에 놓이면 통과하고 아니면 첫 GC의 `G1PrepareRegionsClosure::do_heap_region`에서 SIGSEGV.
+  → pump는 GC 직후에 멈추고(`/health` heapUsed 하락으로 감지), 손상 뒤 요청은 수백 건 이내. 동시 마킹이 시작되면 `G1 Conc#0` SIGSEGV.
+  깨진 배열 참조는 `checkcast`·`aastore`·인터프리터 `bastore`에 닿으면 앱 프레임에서 SIGSEGV.
+- 자산: `exploit/src/J4sRceVictim.java` · `exploit/j4s_rce.py`(공격자) · `exploit/ops_client.py`(정상 ops persona) ·
+  `exploit/j4s_rce.sh`(증거 러너) · `exploit/lab_rce.sh`(dev 랩) · `exploit/results/rce-{vuln,1708,mitig,patched}-2026-11-24-*/`
+- 환경: 로컬 Mac에는 Java 런타임이 없다 — 컴파일·실행은 전부 클러스터 파드에서(`lab_rce.sh start|atk`). JDK HTTP 서버는 헤더·본문을 따로 보내
+  Nagle 지연(40ms/요청)이 있으니 공격자 클라이언트는 `TCP_QUICKACK`를 켠다(`j4s_rce.py` `V.req`).
+- 클러스터: `j4s-rce-dev`·`j4s-rce-e2e` 삭제 확인. ns는 삭제 완료까지 기다린 뒤 재생성할 것(Terminating 경합으로 pod 생성 실패 전례).
+- 위치: 연구 계획 v2.0 §1의 "하지 않는다"(힙 배치·승격 절차 개발)는 그 관측 연구의 범위 선언이다. 체인 5는 그 밖의 별도 작업이며 사전등록 데이터와 무관하다.
+- **커밋:** 체인 5·6 코드·결과물·문서 변경은 2026-11-24에 커밋했다(종전 "미커밋 — PI 검토 후 커밋" 항목 갱신).
+- 남은 선택지 (PI): 공개 범위 결정(랩 모델 결과를 어디까지 리포에 올릴지) · 실앱 표적 재평가(범위 읽기·부분 수정·리플렉션 호출 지점이 있는 서비스) · 다른 JDK 빌드 측정
+
+### 11/23 — 실험 A·B·기전 (종전 기록)
 
 - **실험 A·B 완료** → `research/RESULTS-2026-11-23.md`
   - A: **causal supported** — 17.0.21+9 크래시 6/10 vs 패치(17.0.21.1+2)·완화 플래그·정상 입력 각 0/10 (Holm p=0.016)
@@ -115,6 +158,8 @@ OpenJDK CVE-2026-114938 (Java4Shell — Base64 AVX-512 assembly OOB 쓰기) 대�
 | **WAS 로그·크래시 덤프 패턴** | `WAS-LOG-CRASH-ANALYSIS-2026-11-18.md` — 앱로그 A1~A4 룰, hs_err 서명, GC 로그 룰 |
 | **pcap (공유용)** | `exploit/results/pcap/j4s-e2e-vuln-attacker-full.pcap.gz` (13초 전체, 트리거+사망 RST), `victim-flood.pcap.gz`, `soc-r1.pcap` |
 | E2E 코드 | `exploit/src/Java4ShellE2EVictim.java` + `ops/e2e_java4shell_attacker.sh` + `exploit/e2e_java4shell.sh` |
+| **체인 5 (11/24): OOB 읽기·쓰기 → 코드 실행(캐나리)** | `exploit/E2E-EXPLOIT-SUITE.md` 체인 5 — `exploit/src/J4sRceVictim.java` + `exploit/j4s_rce.py` + `exploit/j4s_rce.sh` |
+| 체인 5 결과 | `exploit/results/rce-{vuln,1708,mitig,patched}-2026-11-24-*/` (취약 9/9 캐나리, 완화·패치 손상 0) |
 | E2E 결과 | `exploit/results/e2e_j4s_{attacker,victim}_{vuln,mitig}.log` (7회, JVM 크래시(DoS) 5회) / `results/hbase_*_vuln.log` (실앱 JVM 크래시 2회) |
 | 빌드 대조 로그 | `exploit/results/jdk17u-build-and-canary.log` (셀 5·6) |
 

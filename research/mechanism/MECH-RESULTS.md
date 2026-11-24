@@ -12,6 +12,11 @@
 
 → 실험 A가 비워 둔 "기전 미관측" 칸과 CORRECTION-3 C-3("쓰기 폭 실측 아님")을 **직접 측정으로** 메움.
 
+> **2026-11-24 후속 (체인 5, `exploit/E2E-EXPLOIT-SUITE.md`):** 아래 "length가 음수 → 유출로 가는 첫 관문이 막힌다"는 해석은 **배열을 통째로 반환하는 경로에만**
+> 해당한다. HotSpot 배열 경계 검사는 부호 없는 비교(`templateTable_x86.cpp:748`, `parse2.cpp:170`)라, 같은 음수 length(`0xa6699aa6`, 이번에도 동일하게 재관측)로
+> **인덱스 단위** OOB 읽기·쓰기가 되고 랩 모델에서 토큰 유출·코드 실행까지 실측됐다. 측정값 자체(아래 수치)는 바뀌지 않는다.
+
+
 ## Method A — 실제 취약 빌드(Temurin 17.0.21+9)에서 헤더 바이트 diff
 
 grooming은 OobCanary와 동일(5리전 갭, dst=3k+1, trigger `A×4k+"=="`). 인접 canary 헤더를

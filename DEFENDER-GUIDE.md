@@ -159,6 +159,18 @@ java -XX:StartFlightRecording=duration=60s,filename=/tmp/jfr/health.jfr,maxsize=
 > 서비스가 정상 응답을 계속한 사례가 있다. 크래시는 **실패했거나 불안정한 시도의 흔적**일 뿐이다.
 > 탐지는 보조 수단이고 패치나 완화가 대체 수단이 아니다.
 
+> **11/24 자체 실측(랩 모델, `exploit/E2E-EXPLOIT-SUITE.md` 체인 5·6):** 코드 실행에 이른 17회 모두 **hs_err 0·JVM 생존**으로 끝났다.
+> 크래시 없음은 비침해 지표가 아니다. **(정정) young GC가 통과한다고 볼 수 없다** — young GC 준비 단계가 손상 객체의 klass를 읽으므로,
+> 통과 여부는 깨진 klass가 읽기 가능한 주소에 놓이는지에 달려 있다(어떤 run은 5회 통과, 다른 run은 첫 GC에 `G1PrepareRegionsClosure` SIGSEGV).
+> 공격자는 GC가 없는 사이에 끝낸다 — 크래시는 안 올 수도, 나중에 올 수도 있다.
+> 같은 랩에서 본 추가 서명: ① 손상 배열을 건드리는 앱 프레임의 `SIGSEGV SEGV_ACCERR`(klass+8 역참조 — `bastore`·`aastore`·`checkcast`),
+> ② `G1 Conc#0`의 `oopDesc::size_given_klass`. ③ 요청 관점: MB급 본문이 `=`/`==`로 끝나는 400 직후, **객체 크기를 넘는 offset의 범위 읽기·부분 수정 요청**.
+> ④ 볼륨: 그 구현은 keep-alive 연결 1개에 송신 3.28 GB(26초)라 "세션당 100 MB" 류의 룰에 걸린다(1회 실측). 단일 최대 요청은 6.67 MiB라
+> 연결을 나누면 걸리지 않는다 — 볼륨 룰은 노력 낮은 시도용이고 ①~③이 이 체인에 더 특이적이다(체인 5 §트래픽 프로파일).
+> ⑤ **(체인 6) 토큰·권한 인터페이스 없이도 됨:** OOB 쓰기 3건 + 요청 1건(`GET /actions/upper?arg=touch%20/tmp/…`)으로 JVM이 자식 프로세스를 만들었다.
+> 가장 직접적인 신호는 **java 프로세스의 예기치 않은 자식 프로세스**(실행 감사·auditd·Falco). 앱 로그에는 무해한 핸들러가
+> `{"result":"Process[pid=…]}`를 돌려주거나, 실패한 시도의 `IllegalArgumentException: object is not an instance of declaring class`가 남는다.
+
 ```bash
 find <앱작업디렉토리> -name 'hs_err_pid*.log' -newermt '-1 hour' \
   -exec grep -lE 'SIGSEGV|SIGBUS|loop|opto' {} \;
