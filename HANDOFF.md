@@ -5,14 +5,30 @@
 
 작성: 2026-11-18 오전 · 갱신: 2026-11-18 저녁 (§6 전 과제 완수 + E2E JVM 크래시(DoS) 재현 + 관제 공유 pcap)
 
-## 0. 현재 상태 (2026-11-24 갱신 — 이 절이 최신)
+## 0. 현재 상태 (2026-11-25 갱신 — 이 절이 최신)
+
+### 11/25 — 체인 6 후속: `Runtime` 미러를 빌드 상수 없이 찾기, 랩 모델
+
+- **결론:** `exploit/E2E-EXPLOIT-SUITE.md` 체인 6 후속. `--runtime-pick oracle`은 미러 상수(미러 거리·klass) 대신 victim에게 묻는다 — 후보 미러를 수신자로
+  `Class.getDeclaredField("currentRuntime")`를 호출하고 응답의 `Field` 문자열로 선언 클래스를 확인한다. **JDK 17 라인 + CDS 기본 아카이브에서 11/11**,
+  이중 한 번도 재지 않은 빌드(17.0.19+10 3회, 17.0.18+8 1회)는 무보정. 후보 9~11번째에서 찾고 체인 5·객체 간 쓰기도 같이 성공.
+- 그 미측정 빌드는 기존 상수와 우연히 같아서 기존 방식도 됐다. 두 방식의 차이는 CDS를 끄거나(새 방식 최종 코드 0/3, 기존 0/1) JDK 21에서 나타난다.
+- **남은 빌드 의존 — 슬롯 두 개:** `exec(String)`=16, `Class.getDeclaredField(String)`=139. CDS 아카이브가 고정하는 값이라 CDS를 끄면 실행 설정마다
+  바뀐다(프로덕션 플래그 JVM에서 16은 `freeMemory()`). JDK 18 이상은 기본 리플렉션이 메서드 핸들 기반(JEP 416)이라 호출 시점에 슬롯을 읽지 않는다.
+  JDK 21.0.13+9는 취약점은 그대로 있고(`f071` length 손상), 레거시 접근자 플래그 + 슬롯 147이면 1/1(dev 랩).
+- CDS를 끈 실행에서도 체인 5(토큰 → `/ops/exec`)와 객체 간 쓰기는 정상.
+- 같은 작업에서 확정한 것: 접근자는 `root`에 공유돼 15번 넘으면 이름 기준 생성 접근자로 바뀐다(둘 다 되돌린다) · 인자 0개 메서드는 수신자에 인자가
+  들어간다(`reflection.cpp`) · 손상 뒤 한참 지나거나 큰 반사 작업 뒤의 첫 PATCH는 해석 실행으로 죽는다 · 엉터리 슬롯 호출 한 번에 victim이 죽는다.
+- 변경: `exploit/j4s_rce.py`(`--runtime-pick oracle`·`--exec-slot`·`--gdf-slot`), `j4s_rce.sh`(`img` 모드, `ATK_ARGS`, `EXTRA_JVM`, 크래시 요약 저장),
+  `lab_rce.sh`(start가 `DEVFLAGS`를 넘김 — 전에는 정의만 되고 안 쓰였다), `src/J4sRceVictim.java`(dev `/dev/label`, 핸들러가 던진 예외의 원인 로그),
+  신규 `runtime_study.sh`. 산출물: `results/rce-*-20261125-*`, `results/runtime-struct/`(17.0.21+9·17.0.8+7·CDS 끔 라벨 대조 데이터).
 
 ### 11/24 — 체인 6: Java4Shell → 메모리 손상만으로 JVM 코드 실행, 랩 모델
 
 - **결론:** `exploit/E2E-EXPLOIT-SUITE.md` 체인 6. 토큰도 권한 인터페이스도 없이, OOB 읽기로 힙의 `Method`·`Runtime.class` 미러·`Runtime` 인스턴스를
   찾은 뒤 OOB 쓰기 3건(각 4바이트)으로 그 `Method`를 `Runtime.exec(String)`으로 바꾸고 무해한 핸들러(`/actions/upper`)을 호출 → JVM이 명령 실행.
   취약 JDK **8/8**(17.0.21+9 6/6 — 원격 1회 포함, 17.0.8+7 2/2), 완화·패치는 트리거 3발씩 손상 0. victim 생존 8/8.
-  **피해자는 랩 모델이며 실앱 대상이 아니다. 빌드별 측정 상수(미러 거리·klass·`exec` idnum)가 필요하다.**
+  **피해자는 랩 모델이며 실앱 대상이 아니다. 빌드별 측정 상수(미러 거리·klass·`exec` idnum)가 필요하다.** (11/25: 미러 상수는 `--runtime-pick oracle`로 뺐고, 슬롯은 남는다.)
 - 같은 8회에서 체인 5(토큰 회수 → `/ops/exec`)도 8/8 다시 확인. 누적으로 체인 5는 17/17.
 - 핵심: ① 호출이 읽는 것은 앱이 가진 `Method` 사본이 아니라 그 `root`(`ReflectionFactory.newMethodAccessor`) ② 네이티브 호출 경로 검사는
   수신자·인자 수·인자 타입 셋 — `(String)` 시그니처라 통과 ③ `Runtime` 미러는 이름이 아니라 **빌드 상수**로 찾는다(`Class.name`은 지연 초기화).
